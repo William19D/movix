@@ -1,0 +1,58 @@
+.topbar-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .logo-container {
+    margin-left: 11%;
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo-image {
+    height: 5vh;
+    margin-right: 10px;
+  }
+  
+  .logo-text {
+    font-size: 4vh !important;
+    margin: 0;
+  }
+  
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 5vh;
+  }
+  
+  .nav-link {
+    text-decoration: none;
+    color: #000;
+    font-size: 2vh !important;
+  }
+  
+  .nav-link:hover {
+    text-decoration: underline;
+  }
+  
+  .login-button {
+    background-color: #b9ff66;
+    font-size: 2vh;
+    border-radius: 14px;
+    border-width: 1px;
+    padding-top: 20px;
+    padding-right: 35px;
+    padding-bottom: 20px;
+    padding-left: 35px;
+    gap: 10px;
+    cursor: pointer;
+    margin-right: 11%;
+  }
+  
+  .login-button:hover {
+    background-color: #a4e05b;
+  }
