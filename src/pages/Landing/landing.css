@@ -1,0 +1,62 @@
+h1 {
+  font-size:500% !important;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+.landing-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+}
+
+.text-content {
+  max-width: 50%;
+  text-align: left;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.description {
+  font-size:150% !important;
+  font-weight: 400;
+  color: #333;
+  margin-bottom: 1.5rem;
+  margin-right: 10%;
+}
+
+.quote-button {
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 28px;
+    letter-spacing: 0%;
+    text-align: center;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    padding: 18px 34px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+
+.quote-button:hover {
+  background-color: #333;
+}
+
+.image-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  max-width: 500px;
+}
+
+.image-content img {
+  margin-left: 30%;
+  width: 200%;
+}
