@@ -54,14 +54,14 @@ const Landing: React.FC = () => {
         </div>
       </div>
       <div className="mt-8 bg-white w-full">
-        <div className="bg-gray-100 p-8 mx-10 rounded-lg shadow-md">
+        <div className="bg-gray-100 p-10 mx-60 rounded-lg shadow-md">
           <h2 className="text-3xl font-bold mb-4">Comencemos</h2>
           <p className="text-lg mb-6">
             Inicia tu experiencia con Envialo en solo unos pasos. Cotiza, rastrea y gestiona tus envíos de manera rápida y sencilla. ¡Tu destino está a un clic de distancia! 🚀
           </p>
           <button className="text-lg bg-black text-white py-3 px-6 rounded-lg">Empezar</button>
         </div>
-        <div className="bg-gray-100 p-8 mx-10 mt-8 rounded-lg shadow-md">
+        <div className="bg-gray-100 p-8 mx-60 mt-8 rounded-lg shadow-md">
           <h2 className="text-3xl font-bold mb-4 bg-[#b9ff66] inline-block p-1 rounded-lg">Nuestras Noticias</h2>
           <p className="text-lg mb-6">
             Mantente al día con nuestros logros y novedades. Descubre cómo mejoramos nuestros servicios y optimizamos nuestras entregas para ti. 📦✨

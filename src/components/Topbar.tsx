@@ -4,13 +4,21 @@ import { useNavigate } from 'react-router-dom';
 const Topbar: React.FC = () => {
   const navigate = useNavigate();
 
+  const handleLogoClick = () => {
+    navigate('/');
+  };
+
   const handleLoginClick = () => {
     navigate('/login');
   };
 
+  const handleRegisterClick = () => {
+    navigate('/register');
+  };
+
   return (
     <div className="flex items-center justify-between p-2.5 px-5 bg-white shadow-md">
-      <div className="flex items-center ml-[11%]">
+      <div className="flex items-center ml-[11%]" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
         <img src="vite.svg" alt="Logo" className="h-[6vh] mr-2.5" />
         <h2 className="text-[5vh] m-0 font-bold">Movix</h2>
       </div>
@@ -27,7 +35,7 @@ const Topbar: React.FC = () => {
         >
           Ingresar
         </button>
-        <a href="#registrarse" className="text-black text-[2vh] hover:underline">Registrarse</a>
+        <a href="register" className="text-black text-[2vh] hover:underline" onClick={handleRegisterClick}>Registrarse</a>
       </div>
     </div>
   );
