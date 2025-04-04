@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Home from "../pages/Landing/Landing";
 import Topbar from "../components/Topbar";
-
+import Login from "../pages/Login/Login";
 const AppContent: React.FC = () => {
   const location = useLocation();
 
@@ -14,7 +14,7 @@ const AppContent: React.FC = () => {
       {!noTopbarRoutes.includes(location.pathname) && <Topbar />}
       <Routes>
         <Route path="/" element={<Home />} />
-        {/* Agrega más rutas según sea necesario */}
+        <Route path="/login" element={<Login />} />
       </Routes>
     </div>
   );
