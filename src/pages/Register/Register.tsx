@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Select, { SingleValue } from 'react-select';
-import axios from 'axios';
 
 interface Option {
   value: number;
@@ -15,9 +14,10 @@ export default function Register() {
 
   useEffect(() => {
     // Obtener la lista de departamentos de Colombia
-    axios.get('https://api-colombia.com/api/v1/Department')
-      .then(response => {
-        const departamentosOptions = response.data.map((departamento: any) => ({
+    fetch('https://api-colombia.com/api/v1/Department')
+      .then(response => response.json())
+      .then(data => {
+        const departamentosOptions = data.map((departamento: any) => ({
           value: departamento.id,
           label: departamento.name,
         }));
@@ -31,9 +31,10 @@ export default function Register() {
   useEffect(() => {
     if (selectedDepartamento) {
       // Obtener los municipios del departamento seleccionado
-      axios.get(`https://api-colombia.com/api/v1/Department/${selectedDepartamento.value}/cities`)
-        .then(response => {
-          const municipiosOptions = response.data.map((municipio: any) => ({
+      fetch(`https://api-colombia.com/api/v1/Department/${selectedDepartamento.value}/cities`)
+        .then(response => response.json())
+        .then(data => {
+          const municipiosOptions = data.map((municipio: any) => ({
             value: municipio.id,
             label: municipio.name,
           }));
