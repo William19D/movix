@@ -5,8 +5,8 @@ import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult
+  getRedirectResult,
+  onAuthStateChanged // Añade esto
 } from 'firebase/auth';
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -19,6 +19,7 @@ export default function LoginForm() {
   const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [userPhoto, setUserPhoto] = useState<string | null>(null);
 
   // Manejo del resultado de redirección
   useEffect(() => {
@@ -34,6 +35,37 @@ export default function LoginForm() {
     };
     handleRedirectResult();
   }, [navigate]);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserPhoto(user.photoURL);
+      } else {
+        setUserPhoto(null);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Autenticación con Google
+  const signInWithGoogle = async () => {
+    try {
+      setGoogleLoading(true);
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      
+      const result = await signInWithPopup(auth, provider);
+      if (result.user?.photoURL) {
+        setUserPhoto(result.user.photoURL);
+      }
+      navigate('/dashboard');
+    } catch (error: any) {
+      handleAuthError(error);
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
 
   // Función para manejar errores
   const handleAuthError = (error: any) => {
@@ -53,24 +85,6 @@ export default function LoginForm() {
     
     setError(errorMap[error.code] || errorMap['default']);
     setIsModalOpen(true);
-  };
-
-  // Autenticación con Google mediante Popup
-  const signInWithGoogle = async () => {
-    try {
-      setGoogleLoading(true);
-      const provider = new GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: 'select_account' });
-      
-      // Usamos popup para dispositivos de escritorio
-      const result = await signInWithPopup(auth, provider);
-      console.log('Usuario de Google:', result.user);
-      navigate('/dashboard');
-    } catch (error: any) {
-      handleAuthError(error);
-    } finally {
-      setGoogleLoading(false);
-    }
   };
 
   // Autenticación con email y contraseña
@@ -139,7 +153,16 @@ export default function LoginForm() {
 
         <div className="flex flex-col items-center justify-center w-1/2">
           <div className="flex flex-col items-center mb-6">
-            <div className="w-16 h-16 bg-gray-300 rounded-full mb-4" />
+             {userPhoto ? (
+          <img 
+            src={userPhoto} 
+            alt="Foto de perfil" 
+            className="w-16 h-16 rounded-full mb-4 object-cover"
+            referrerPolicy="no-referrer" // Para evitar problemas con imágenes de Google
+          />
+        ) : (
+          <div className="w-16 h-16 bg-gray-300 rounded-full mb-4" />
+        )}
             <h2 className="text-2xl font-semibold">Iniciar sesión</h2>
             <p className="text-gray-500 text-sm">
               ¿No tienes una cuenta?{' '}
