@@ -6,7 +6,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   getRedirectResult,
-  onAuthStateChanged // Añade esto
+  onAuthStateChanged
 } from 'firebase/auth';
 import { motion, AnimatePresence } from "framer-motion";
 
