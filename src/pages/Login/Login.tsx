@@ -27,7 +27,7 @@ export default function LoginForm() {
       try {
         const result = await getRedirectResult(auth);
         if (result?.user) {
-          navigate('/dashboard');
+          navigate('/home');
         }
       } catch (error: any) {
         handleAuthError(error);
@@ -58,7 +58,7 @@ export default function LoginForm() {
       if (result.user?.photoURL) {
         setUserPhoto(result.user.photoURL);
       }
-      navigate('/dashboard');
+      navigate('/home');
     } catch (error: any) {
       handleAuthError(error);
     } finally {
