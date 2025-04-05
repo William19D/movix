@@ -3,21 +3,15 @@ import Select, { SingleValue } from 'react-select';
 import { auth, db } from '../../firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { collection, doc, setDoc } from 'firebase/firestore';
+import { motion, AnimatePresence } from "framer-motion";
 
 
 interface Option {
     value: number;
     label: string;
 }
-interface User {
-  name: string;
-  email: string;
-  password: string;
-  departamento: string;
-  municipio: string;
-}
 
-export default function Register() {
+const Register: React.FC = () => {
     const [departments, setDepartments] = useState<Option[]>([]);
     const [cities, setCities] = useState<Option[]>([]);
     const [selectedDepartment, setSelectedDepartment] = useState<SingleValue<Option>>(null);
@@ -82,6 +76,11 @@ export default function Register() {
 
     const registerUser = async (e: React.FormEvent) => {
       e.preventDefault();
+      if (!name || !email || !password || !selectedDepartment || !selectedCity) {
+        setError("Por favor, completa todos los campos obligatorios.");
+        setIsModalOpen(true);
+        return; // Detiene la ejecución si hay campos vacíos
+    }
       try {
           // Crea el usuario en Firebase Authentication
           const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -118,34 +117,41 @@ export default function Register() {
         }
     };
 
-    const closeModal = () => {
-        setIsModalOpen(false);
-        setError(null);
-    };
+
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
-               {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center">
-                    {/* Fondo con blur y transición suave */}
-                    <div
-                        className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity duration-300"
-                        onClick={closeModal} // Cierra al hacer clic fuera
-                    ></div>
+            <AnimatePresence>
+                {isModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center">
+                        {/* Fondo con animación de fade */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+                            onClick={() => setIsModalOpen(false)}
+                        ></motion.div>
 
-                    {/* Contenedor del modal con animación de escala */}
-                    <div className="relative bg-white p-6 rounded-xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 animate-[fadeIn_0.3s_ease-out]">
-                        <h3 className="text-xl font-bold text-red-600 mb-3">Error en el registro</h3>
-                        <p className="text-gray-700 mb-5">{error}</p>
-                        <button
-                            onClick={closeModal}
-                            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                        {/* Modal con animación de escala y fade */}
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="relative bg-white p-6 rounded-xl shadow-xl w-full max-w-md mx-4"
                         >
-                            Entendido
-                        </button>
+                            <h3 className="text-xl font-bold text-red-600 mb-3">Error</h3>
+                            <p className="text-gray-700 mb-5">{error}</p>
+                            <button
+                                onClick={() => setIsModalOpen(false)}
+                                className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                            >
+                                Cerrar
+                            </button>
+                        </motion.div>
                     </div>
-                </div>
-            )}
+                )}
+            </AnimatePresence>
             <div className="flex bg-white p-8 rounded-2xl shadow-lg w-3/4">
                 <div className="flex flex-col items-start justify-center w-1/2 pr-8">
                     <h2 className="text-3xl font-semibold mb-4">Bienvenido a Movix</h2>
@@ -161,11 +167,11 @@ export default function Register() {
                     <form className="space-y-4 w-full" onSubmit={registerUser}>
                         <div>
                             <label className="text-sm text-gray-600">Nombre</label>
-                            <input type="text" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value={name} onChange={(e) => setName(e.target.value)} />
+                            <input type="text" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value={name} onChange={(e) => setName(e.target.value)}  />
                         </div>
                         <div>
                             <label className="text-sm text-gray-600">Correo electrónico</label>
-                            <input type="email" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value={email} onChange={(e) => setEmail(e.target.value)} />
+                            <input type="email" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value={email} onChange={(e) => setEmail(e.target.value)}  />
                         </div>
                         <div>
                             <label className="text-sm text-gray-600">Contraseña</label>
@@ -175,6 +181,7 @@ export default function Register() {
                                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
+                                    
                                 />
                                 <span
                                     className="absolute inset-y-0 right-3 flex items-center text-gray-400 cursor-pointer"
@@ -210,3 +217,4 @@ export default function Register() {
         </div>
     );
 }
+export default Register;
