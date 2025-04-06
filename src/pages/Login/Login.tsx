@@ -100,7 +100,7 @@ export default function LoginForm() {
   
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate('/dashboard');
+      navigate('/home');
     } catch (error: any) {
       handleAuthError(error);
     }

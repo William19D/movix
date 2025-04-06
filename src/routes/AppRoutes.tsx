@@ -6,22 +6,21 @@ import TopbarUser from '../components/TopBarUser'; // Asegúrate de importar Top
 import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
 import Home from "../pages/Home/Home";
+import Shipment from "../pages/Register-Shipment/shipment"
 
 const AppContent: React.FC = () => {
   const location = useLocation();
-
-  // Lista de rutas donde la topbar no debe mostrarse
   const noTopbarRoutes: string[] = ["/home"];
-
   return (
     <div>
-      {!noTopbarRoutes.includes(location.pathname) && <Topbar />}
-      {location.pathname === "/home" && <TopbarUser />}
+      {!noTopbarRoutes.includes(location.pathname) && location.pathname !== "/shipment" && <Topbar />}
+      {(location.pathname === "/shipment" || location.pathname === "/home") && <TopbarUser />}
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/shipment" element={<Shipment />} />
         {/* Puedes agregar más rutas aquí */}
       </Routes>
     </div>
