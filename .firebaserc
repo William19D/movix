@@ -1,1 +1,8 @@
-{}
+{
+  "projects": {
+    "yes": "movix-efd31",
+    "movix": "movix-efd31"
+  },
+  "targets": {},
+  "etags": {}
+}
