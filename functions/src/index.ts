@@ -24,7 +24,7 @@ const haversineDistance = (
 };
 
 const calcularCostoPorRangos = (distancia: number, peso: number, tamano: number, valorDeclarado: number) => {
-  const costoBase = 8000; // Costo mínimo
+  const costoBase = 3000; // Costo mínimo
   let costoDistancia = 0;
   let costoPeso = 0;
   let costoTamano = 0;

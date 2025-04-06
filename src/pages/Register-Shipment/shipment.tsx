@@ -59,43 +59,47 @@ const Shipment: React.FC = () => {
   }, [selectedDestinationDepartment]);
 
   const calculateDistanceAndCost = async () => {
-    if (selectedOriginCity && selectedDestinationCity && selectedOriginCity !== selectedDestinationCity) {
-      try {
-        const response = await fetch("https://calcularcostoenvio-dc3dtifeqq-uc.a.run.app", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            tamano: length + width + height, // Tamaño total
-            peso: weight, // Peso del paquete
-            origen: selectedOriginCity, // Ciudad de origen
-            destino: selectedDestinationCity, // Ciudad de destino
-            valorDeclarado: declaredValue, // Valor declarado
-          }),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          let costo = data.costo; // Costo base calculado desde el backend
-
-          // Agregar recargo por envío urgente
-          if (shippingType === "urgent") {
-            costo += 2000;
+    if (selectedOriginCity && selectedDestinationCity) {
+      if (selectedOriginCity !== selectedDestinationCity) {
+        try {
+          const response = await fetch("https://calcularcostoenvio-dc3dtifeqq-uc.a.run.app", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              tamano: length + width + height, // Tamaño total
+              peso: weight, // Peso del paquete
+              origen: selectedOriginCity, // Ciudad de origen
+              destino: selectedDestinationCity, // Ciudad de destino
+              valorDeclarado: declaredValue, // Valor declarado
+            }),
+          });
+  
+          const data = await response.json();
+  
+          if (response.ok) {
+            let costo = data.costo; // Costo base calculado desde el backend
+  
+            // Agregar recargo por envío urgente
+            if (shippingType === "urgent") {
+              costo += 2000;
+            }
+  
+            // Redondear el costo a un número entero
+            costo = Math.round(costo);
+  
+            setShippingCost(costo); // Costo calculado
+            setNotification({ type: "success", message: `Costo calculado exitosamente.` });
+          } else {
+            setNotification({ type: "error", message: data.error || "Error al calcular el costo de envío." });
           }
-
-          // Redondear el costo a un número entero
-          costo = Math.round(costo);
-
-          setShippingCost(costo); // Costo calculado
-          setNotification({ type: "success", message: `Costo calculado exitosamente. Seguro: $${data.seguro}` });
-        } else {
-          setNotification({ type: "error", message: data.error || "Error al calcular el costo de envío." });
+        } catch (error) {
+          setNotification({ type: "error", message: "Error al conectar con el servidor. Inténtalo nuevamente." });
+          console.error("Error al calcular la distancia:", error);
         }
-      } catch (error) {
-        setNotification({ type: "error", message: "Error al conectar con el servidor. Inténtalo nuevamente." });
-        console.error("Error al calcular la distancia:", error);
+      }else{
+        setNotification({ type: "warning", message: "La ciudad de origen y destino no pueden ser iguales." });
       }
     } else {
       setNotification({ type: "warning", message: "Por favor, selecciona las ciudades de origen y destino." });
