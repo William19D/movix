@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Services from '../../core/services/services';
+import { useNavigate } from 'react-router-dom';
 
 const Cotizar: React.FC = () => {
+  const navigate = useNavigate();
   const [length, setLength] = useState(0);
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
@@ -91,9 +93,21 @@ const Cotizar: React.FC = () => {
     }
   }, [notification]);
 
+    const handleRegresarClick = () => {
+    navigate('/admin-dashboard');
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
       <div className="bg-white p-8 rounded-2xl shadow-lg max-w-3xl w-full">
+        <div className="flex justify-end mb-4">
+          <button className=
+          "bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg"
+          onClick={handleRegresarClick}
+          >
+            Regresar
+          </button>
+        </div>
         <h1 className="text-3xl font-bold mb-6 text-center">📦 Cotizador de Envíos</h1>
 
         {notification && (

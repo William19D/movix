@@ -121,12 +121,38 @@ const Shipment: React.FC = () => {
     }
   }, [notification]);
 
-  const handleSubmit = () => {
+  const saveShipmet = async () => {
     if (!shippingCost) {
       setNotification({ type: "error", message: "Por favor, calcula el costo del envío antes de continuar." });
       return;
     }
-
+    else{
+      const response = await fetch("https://registrarenvio-dc3dtifeqq-uc.a.run.app", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ciudadDestino: selectedDestinationCity,
+          ciudadOrigen: selectedOriginCity,
+          departamentoDestino: departments.find(dep => dep.id === selectedDestinationDepartment)?.name,
+          departamentoOrigen: departments.find(dep => dep.id === selectedOriginDepartment)?.name,
+          celularDestinatario: recipientContactNumber,
+          direccionDestino: deliveryAddress,
+          nombreDestinatario: recipientName,
+          nombreRemitente: senderName,
+          tipoEnvio: shippingType,
+          valorDeclarado: declaredValue
+        }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setNotification({ type: "success", message: `Envío registrado exitosamente. Código de seguimiento: ${data.codigoSeguimiento}` });
+      }
+      else {
+        setNotification({ type: "error", message: data.error || "Error al registrar el envío." });
+      }
+    }
     console.log({
       length,
       width,
@@ -153,13 +179,23 @@ const Shipment: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-4xl">
+        <div className="flex justify-end mb-4">
+          <button className=
+          "bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg"
+          onClick={() => window.history.back()}
+          >
+            Regresar
+          </button>
+        </div>
         <h1 className="text-3xl font-semibold mb-4">🚚 Envía tu Paquete en Minutos</h1>
         <p className="text-gray-500 text-lg mb-6">
           Realiza tu envío de forma fácil y segura. Ingresa los detalles de tu paquete,
           selecciona el destino y nuestro equipo de logística se encargará de recogerlo
           en la dirección indicada. ¡Nosotros nos encargamos del resto!
         </p>
+
         {notification && (
           <div
             className={`p-4 mb-4 rounded-lg ${
@@ -431,7 +467,7 @@ const Shipment: React.FC = () => {
               </div>
             </div>
             <button
-              onClick={handleSubmit}
+              onClick={saveShipmet}
               className="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition mt-6"
             >
               Proceder con el pago

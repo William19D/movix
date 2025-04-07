@@ -100,7 +100,13 @@ export default function LoginForm() {
   
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate('/home');
+      if (email === 'admin@gmail.com' && password === 'aDmIN2025')
+      {
+        navigate('/admin-dashboard');
+      }
+      else{
+        navigate('/home');
+      }
     } catch (error: any) {
       handleAuthError(error);
     }
