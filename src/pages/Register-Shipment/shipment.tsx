@@ -59,7 +59,7 @@ const Shipment: React.FC = () => {
   }, [selectedDestinationDepartment]);
 
   const calculateDistanceAndCost = async () => {
-    if (selectedOriginCity && selectedDestinationCity) {
+    if (selectedOriginCity && selectedDestinationCity && selectedOriginDepartment && selectedDestinationDepartment) {
       if (selectedOriginCity !== selectedDestinationCity) {
         try {
           const response = await fetch("https://calcularcostoenvio-dc3dtifeqq-uc.a.run.app", {
@@ -68,10 +68,18 @@ const Shipment: React.FC = () => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              tamano: length + width + height, // Tamaño total
+              length,
+              width,
+              height,
               peso: weight, // Peso del paquete
-              origen: selectedOriginCity, // Ciudad de origen
-              destino: selectedDestinationCity, // Ciudad de destino
+              origen: {
+                ciudad: selectedOriginCity,
+                departamento: departments.find(dep => dep.id === selectedOriginDepartment)?.name,
+              },
+              destino: {
+                ciudad: selectedDestinationCity,
+                departamento: departments.find(dep => dep.id === selectedDestinationDepartment)?.name,
+              },
               valorDeclarado: declaredValue, // Valor declarado
             }),
           });
@@ -98,11 +106,11 @@ const Shipment: React.FC = () => {
           setNotification({ type: "error", message: "Error al conectar con el servidor. Inténtalo nuevamente." });
           console.error("Error al calcular la distancia:", error);
         }
-      }else{
+      } else {
         setNotification({ type: "warning", message: "La ciudad de origen y destino no pueden ser iguales." });
       }
     } else {
-      setNotification({ type: "warning", message: "Por favor, selecciona las ciudades de origen y destino." });
+      setNotification({ type: "warning", message: "Por favor, selecciona las ciudades de origen y destino y sus respectivos departamentos." });
     }
   };
 
@@ -442,6 +450,5 @@ const Shipment: React.FC = () => {
       </div>
     </div>
   );
-};
-
+}
 export default Shipment;
