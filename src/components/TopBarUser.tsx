@@ -1,22 +1,23 @@
-import React, { useState, useEffect } from 'react';
+//import React, { useState, useEffect } from 'react';
+import React, {useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
 
 const TopbarUser: React.FC = () => {
   const navigate = useNavigate();
-  const [userName, setUserName] = useState<string | null>(null);
-  const [userPhoto, setUserPhoto] = useState<string | null>(null);
-  const [menuOpen, setMenuOpen] = useState<boolean>(false);
+  //const [userName, setUserName] = useState<string | null>(null);
+  //const [userPhoto, setUserPhoto] = useState<string | null>(null);
+  //const [menuOpen, setMenuOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setUserName(user.displayName || user.email);
-        setUserPhoto(user.photoURL);
+        //setUserName(user.displayName || user.email);
+       // setUserPhoto(user.photoURL);
       } else {
-        setUserName(null);
-        setUserPhoto(null);
+        //setUserName(null);
+        //setUserPhoto(null);
         navigate('/login');
       }
     });
@@ -36,10 +37,10 @@ const TopbarUser: React.FC = () => {
     });
   };
 
-  const toggleMenu = () => {
+  /*const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
-
+*/
   const handleCotizarClick = () => {
     navigate('/cotizar');
   };
