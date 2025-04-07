@@ -121,12 +121,38 @@ const Shipment: React.FC = () => {
     }
   }, [notification]);
 
-  const handleSubmit = () => {
+  const saveShipmet = async () => {
     if (!shippingCost) {
       setNotification({ type: "error", message: "Por favor, calcula el costo del envío antes de continuar." });
       return;
     }
-
+    else{
+      const response = await fetch("https://registrarenvio-dc3dtifeqq-uc.a.run.app", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ciudadDestino: selectedDestinationCity,
+          ciudadOrigen: selectedOriginCity,
+          departamentoDestino: departments.find(dep => dep.id === selectedDestinationDepartment)?.name,
+          departamentoOrigen: departments.find(dep => dep.id === selectedOriginDepartment)?.name,
+          celularDestinatario: recipientContactNumber,
+          direccionDestino: deliveryAddress,
+          nombreDestinatario: recipientName,
+          nombreRemitente: senderName,
+          tipoEnvio: shippingType,
+          valorDeclarado: declaredValue
+        }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setNotification({ type: "success", message: `Envío registrado exitosamente. Código de seguimiento: ${data.codigoSeguimiento}` });
+      }
+      else {
+        setNotification({ type: "error", message: data.error || "Error al registrar el envío." });
+      }
+    }
     console.log({
       length,
       width,
@@ -431,7 +457,7 @@ const Shipment: React.FC = () => {
               </div>
             </div>
             <button
-              onClick={handleSubmit}
+              onClick={saveShipmet}
               className="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition mt-6"
             >
               Proceder con el pago
