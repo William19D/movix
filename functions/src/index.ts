@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { onRequest } from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 import cors from "cors";
@@ -255,3 +256,5 @@ export const calcularCostoEnvio = onRequest(async (request, response) => {
     }
   });
 });
+=======
+>>>>>>> e5c339025fd567e84fb84b0410640660c32b0418

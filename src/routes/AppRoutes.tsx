@@ -7,7 +7,7 @@ import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
 import Home from "../pages/Home/Home";
 import Shipment from "../pages/Register-Shipment/shipment"
-
+import Cotizar from "../pages/Cotizar/Cotizar";
 const AppContent: React.FC = () => {
   const location = useLocation();
   const noTopbarRoutes: string[] = ["/home"];
@@ -21,6 +21,7 @@ const AppContent: React.FC = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/home" element={<Home />} />
         <Route path="/shipment" element={<Shipment />} />
+        <Route path="/cotizar" element={<Cotizar />} />
         {/* Puedes agregar más rutas aquí */}
       </Routes>
     </div>
