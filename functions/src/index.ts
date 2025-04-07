@@ -3,7 +3,11 @@ import * as logger from "firebase-functions/logger";
 import cors from "cors";
 import fetch from "node-fetch";
 import { v4 as uuidv4 } from 'uuid';
+import * as admin from 'firebase-admin';
+import { initializeApp } from 'firebase-admin/app';
 
+initializeApp();
+const db = admin.firestore();
 const corsHandler = cors({ origin: true });
 
 const haversineDistance = (
@@ -17,9 +21,9 @@ const haversineDistance = (
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(toRad(coords1.lat)) *
-      Math.cos(toRad(coords2.lat)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos(toRad(coords2.lat)) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c; // Distancia en km
 };
@@ -69,16 +73,66 @@ const calcularCostoPorRangos = (distancia: number, peso: number, tamano: number,
 };
 
 // Bloque de código para generar el código de seguimiento a un envío
-const generarCodigoSeguimeinto= () : string =>{
+const generarCodigoSeguimeinto = (): string => {
   const uuid = uuidv4().split('-')[0].toUpperCase(); //identificador único universla
   const tiempo = Date.now().toString().slice(-5);// da algo de orden cronológcio
   return `Código de envío : CDE-${uuid}-${tiempo}`;
 }
-for (let i = 0; i < 5; i++) {
-  console.log(generarCodigoSeguimeinto());
-}
 
-// Función 
+// Función para crear un envío
+const crearEnvio = async (ciudadDestino: string, ciudadOrigen: string, departamentoDestino: string,
+  departamentoOrigen: string, celularDestinatario: string, direccionDestino: string,
+  nombreDestinatario: string, nombreRemitente: string, tipoEnvio: string, valorDeclarado: number) => {
+
+  const codSeguimiento = generarCodigoSeguimeinto();
+
+  const nuevoEnvio = {
+    ciudadDestino,
+    ciudadOrigen,
+    departamentoDestino,
+    departamentoOrigen,
+    celularDestinatario,
+    codigoSeguimiento: codSeguimiento,
+    direccionDestino,
+    estado: 'Pendiente de pago',
+    fechaCreacion: new Date(),
+    nombreDestinatario,
+    nombreRemitente,
+    tipoEnvio,
+    valorDeclarado
+  }
+  try {
+    const envio = await db.collection('envios').add(nuevoEnvio);
+    return { id: envio.id, ...nuevoEnvio };
+  } catch (error) {
+    console.log(error);
+
+    throw new Error('Error al crear un envío');
+  }
+}
+// función encargada de registrar el envío 
+export const registrarEnvio = onRequest(async (request, response) => {
+  try {
+    const { ciudadDestino, ciudadOrigen, departamentoDestino, departamentoOrigen, celularDestinatario,
+      direccionDestino, nombreDestinatario, nombreRemitente, tipoEnvio, valorDeclarado } = request.body;
+
+    if (!celularDestinatario && !direccionDestino && !nombreDestinatario && !nombreRemitente
+      && !valorDeclarado
+    ) {
+      response.status(400).send("Información incompleta o inválida");
+      return;
+    }
+
+    const envio = await crearEnvio(ciudadDestino, ciudadOrigen, departamentoDestino, departamentoOrigen, celularDestinatario,
+      direccionDestino, nombreDestinatario, nombreRemitente, tipoEnvio, valorDeclarado);
+
+    response.status(200).json(envio);
+  } catch (error) {
+    console.error("Error al crear envío:", error);
+    response.status(500).send("Error al rgeistrar el envío");
+  }
+});
+
 export const calcularCostoEnvio = onRequest(async (request, response) => {
   corsHandler(request, response, async () => {
     logger.info("Solicitud recibida para calcular costo de envío", {
