@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
 
-const TopbarUser: React.FC = () => {
+const TopbarAdmin: React.FC = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState<string | null>(null);
   const [userPhoto, setUserPhoto] = useState<string | null>(null);
@@ -56,7 +56,9 @@ const TopbarUser: React.FC = () => {
         <a href="#enviar" className="text-black text-[2vh] no-underline hover:underline">Enviar</a>
         <a href="#contactanos" className="text-black text-[2vh] no-underline hover:underline">Contáctanos</a>
       </div>
-      {/*<div className="flex items-center gap-5 mr-[11%] relative">
+     {
+      /*
+      <div className="flex items-center gap-5 mr-[11%] relative">
         {userName && userPhoto && (
           <div className="relative">
             <div className="flex items-center cursor-pointer" onClick={toggleMenu}>
@@ -80,17 +82,18 @@ const TopbarUser: React.FC = () => {
             )}
           </div>
         )}
-      </div>*/}
-      <div>
-        <button 
-        className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-        onClick={handleLogout}
-        >
-          Cerrar sesión
-        </button>
-      </div>
+      </div> 
+      */
+     } 
+     <div>
+      <button 
+      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+      onClick={handleLogout}>
+        Cerrar Sesion
+      </button>
+     </div>
     </div>
   );
 };
 
-export default TopbarUser;
+export default TopbarAdmin;

@@ -179,13 +179,23 @@ const Shipment: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-4xl">
+        <div className="flex justify-end mb-4">
+          <button className=
+          "bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg"
+          onClick={() => window.history.back()}
+          >
+            Regresar
+          </button>
+        </div>
         <h1 className="text-3xl font-semibold mb-4">🚚 Envía tu Paquete en Minutos</h1>
         <p className="text-gray-500 text-lg mb-6">
           Realiza tu envío de forma fácil y segura. Ingresa los detalles de tu paquete,
           selecciona el destino y nuestro equipo de logística se encargará de recogerlo
           en la dirección indicada. ¡Nosotros nos encargamos del resto!
         </p>
+
         {notification && (
           <div
             className={`p-4 mb-4 rounded-lg ${

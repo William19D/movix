@@ -6,6 +6,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import Landing from "../pages/Landing/Landing";
 import Topbar from "../components/Topbar";
 import TopbarUser from "../components/TopBarUser";
+import TopbarAdmin from "../components/TopBarAdmin";
 import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
 import Home from "../pages/Home/Home";
@@ -16,11 +17,18 @@ import Admin from "../pages/Admin/Admin";
 const AppContent: React.FC = () => {
   const location = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsAuthenticated(!!user);
+      if (user) {
+        setIsAuthenticated(true);
+        setIsAdmin(user.email === "admin@gmail.com"); // Ajusta el correo según tu lógica
+      } else {
+        setIsAuthenticated(false);
+        setIsAdmin(false);
+      }
       setLoading(false);
     });
 
@@ -33,11 +41,20 @@ const AppContent: React.FC = () => {
 
   return (
     <div>
-      {/* Si el usuario está autenticado, siempre se muestra TopbarUser */}
-      {isAuthenticated && <TopbarUser />}
+      {/* Si es admin y está en /admin-dashboard */}
+      {isAuthenticated && isAdmin && location.pathname === "/admin-dashboard" && (
+        <TopbarAdmin />
+      )}
 
-      {/* Si no está autenticado y la ruta NO está en la lista, mostrar Topbar */}
-      {!isAuthenticated && !noTopbarRoutes.includes(location.pathname) && <Topbar />}
+      {/* Si es usuario autenticado (NO admin) */}
+      {isAuthenticated && !isAdmin && (
+        <TopbarUser />
+      )}
+
+      {/* Si no está autenticado y la ruta no está en la lista */}
+      {!isAuthenticated && !noTopbarRoutes.includes(location.pathname) && (
+        <Topbar />
+      )}
 
       <Routes>
         <Route path="/" element={<Landing />} />

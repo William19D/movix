@@ -10,14 +10,16 @@ const Home: React.FC = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setUserName(user.displayName || user.email);
+        const nameFromEmail = user.email ? user.email.split('@')[0] : '';
+        setUserName(user.displayName || nameFromEmail);
       } else {
         navigate('/login');
       }
     });
-
+  
     return () => unsubscribe();
   }, [navigate]);
+  
 
   const handleNavigation = (path: string) => {
     navigate(path);
