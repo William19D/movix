@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Services from '../../core/services/services';
 import { useNavigate } from 'react-router-dom';
 
-const Cotizar: React.FC = () => {
+const CotizarAdmin: React.FC = () => {
   const navigate = useNavigate();
   const [length, setLength] = useState(0);
   const [width, setWidth] = useState(0);
@@ -94,7 +94,7 @@ const Cotizar: React.FC = () => {
   }, [notification]);
 
     const handleRegresarClick = () => {
-    navigate('/home');
+    navigate('/admin-dashboard');
   };
 
   return (
@@ -299,4 +299,4 @@ const Cotizar: React.FC = () => {
   );
 };
 
-export default Cotizar;
+export default CotizarAdmin;

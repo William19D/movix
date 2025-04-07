@@ -13,6 +13,7 @@ import Home from "../pages/Home/Home";
 import Shipment from "../pages/Register-Shipment/shipment";
 import Cotizar from "../pages/Cotizar/Cotizar";
 import Admin from "../pages/Admin/Admin";
+import CotizarAdmin from "../pages/Cotizar/CotizarAdmdin";
 
 const AppContent: React.FC = () => {
   const location = useLocation();
@@ -64,6 +65,8 @@ const AppContent: React.FC = () => {
         <Route path="/shipment" element={<Shipment />} />
         <Route path="/cotizar" element={<Cotizar />} />
         <Route path="/admin-dashboard" element={<Admin />} />
+        <Route path="/cotizar-admin" element={<CotizarAdmin />} />
+
       </Routes>
     </div>
   );

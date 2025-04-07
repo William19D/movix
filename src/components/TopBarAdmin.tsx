@@ -43,7 +43,7 @@ const TopbarAdmin: React.FC = () => {
   };
 
   const handleCotizarClick = () => {
-    navigate('/cotizar');
+    navigate('/cotizar-admin');
   };
 
   const handleNotify = () => {
