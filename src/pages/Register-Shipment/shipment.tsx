@@ -25,7 +25,7 @@ const Shipment: React.FC = () => {
   const [additionalInstructions, setAdditionalInstructions] = useState<string>('');
   const [paymentMethod, setPaymentMethod] = useState<string>('');
   const [shippingCost, setShippingCost] = useState<number | null>(null);
-  const [distance, setDistance] = useState<number | null>(null);
+  const [notification, setNotification] = useState<{ type: string; message: string } | null>(null);
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -58,38 +58,75 @@ const Shipment: React.FC = () => {
     fetchDestinationCities();
   }, [selectedDestinationDepartment]);
 
-  const calculateDistance = async () => {
-    if (selectedOriginCity && selectedDestinationCity) {
-      try {
-        const response = await fetch(`https://api.distancematrix.com/api/distance?origins=${selectedOriginCity}&destinations=${selectedDestinationCity}&key=YOUR_API_KEY`);
-        const data = await response.json();
-        const distanceData = data.rows[0].elements[0].distance.value;
-        setDistance(distanceData / 1000); // Convertir a kilómetros
-      } catch (error) {
-        console.error('Error al calcular la distancia:', error);
+  const calculateDistanceAndCost = async () => {
+    if (selectedOriginCity && selectedDestinationCity && selectedOriginDepartment && selectedDestinationDepartment) {
+      if (selectedOriginCity !== selectedDestinationCity) {
+        try {
+          const response = await fetch("https://calcularcostoenvio-dc3dtifeqq-uc.a.run.app", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              length,
+              width,
+              height,
+              peso: weight, // Peso del paquete
+              origen: {
+                ciudad: selectedOriginCity,
+                departamento: departments.find(dep => dep.id === selectedOriginDepartment)?.name,
+              },
+              destino: {
+                ciudad: selectedDestinationCity,
+                departamento: departments.find(dep => dep.id === selectedDestinationDepartment)?.name,
+              },
+              valorDeclarado: declaredValue, // Valor declarado
+            }),
+          });
+  
+          const data = await response.json();
+  
+          if (response.ok) {
+            let costo = data.costo; // Costo base calculado desde el backend
+  
+            // Agregar recargo por envío urgente
+            if (shippingType === "urgent") {
+              costo += 2000;
+            }
+  
+            // Redondear el costo a un número entero
+            costo = Math.round(costo);
+  
+            setShippingCost(costo); // Costo calculado
+            setNotification({ type: "success", message: `Costo calculado exitosamente.` });
+          } else {
+            setNotification({ type: "error", message: data.error || "Error al calcular el costo de envío." });
+          }
+        } catch (error) {
+          setNotification({ type: "error", message: "Error al conectar con el servidor. Inténtalo nuevamente." });
+          console.error("Error al calcular la distancia:", error);
+        }
+      } else {
+        setNotification({ type: "warning", message: "La ciudad de origen y destino no pueden ser iguales." });
       }
+    } else {
+      setNotification({ type: "warning", message: "Por favor, selecciona las ciudades de origen y destino y sus respectivos departamentos." });
     }
   };
 
   useEffect(() => {
-    calculateDistance();
-  }, [selectedOriginCity, selectedDestinationCity]);
-
-  const calculateShippingCost = () => {
-    const baseCost = 5000;
-    const weightCost = weight * 1000;
-    const dimensionCost = (length + width + height) * 10;
-    const urgencyCost = shippingType === 'urgent' ? 2000 : 0;
-    const distanceCost = distance ? distance * 100 : 0; // 100 unidades monetarias por km
-    const totalCost = baseCost + weightCost + dimensionCost + urgencyCost + distanceCost;
-    setShippingCost(totalCost);
-  };
-
-  useEffect(() => {
-    calculateShippingCost();
-  }, [length, width, height, weight, shippingType, distance]);
+    if (notification) {
+      const timer = setTimeout(() => setNotification(null), 5000); // Limpiar notificación después de 5 segundos
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   const handleSubmit = () => {
+    if (!shippingCost) {
+      setNotification({ type: "error", message: "Por favor, calcula el costo del envío antes de continuar." });
+      return;
+    }
+
     console.log({
       length,
       width,
@@ -123,7 +160,21 @@ const Shipment: React.FC = () => {
           selecciona el destino y nuestro equipo de logística se encargará de recogerlo
           en la dirección indicada. ¡Nosotros nos encargamos del resto!
         </p>
+        {notification && (
+          <div
+            className={`p-4 mb-4 rounded-lg ${
+              notification.type === "success"
+                ? "bg-green-100 text-green-700"
+                : notification.type === "error"
+                ? "bg-red-100 text-red-700"
+                : "bg-yellow-100 text-yellow-700"
+            }`}
+          >
+            {notification.message}
+          </div>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
           <div>
             <h2 className="text-2xl font-semibold mb-4">Detalles del Paquete</h2>
             <div className="space-y-4">
@@ -199,9 +250,9 @@ const Shipment: React.FC = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-gray-700">Departamento y Ciudad de origen</label>
+                <label className="mt-8.5 block text-gray-700">Departamento y Ciudad de origen</label>
                 <select
-                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  className="w-full  p-2 border border-gray-300 rounded-lg"
                   value={selectedOriginDepartment || ''}
                   onChange={(e) => setSelectedOriginDepartment(parseInt(e.target.value))}
                 >
@@ -222,36 +273,22 @@ const Shipment: React.FC = () => {
                   ))}
                 </select>
               </div>
-              <div>
-                <label className="block text-gray-700">Departamento y Ciudad de destino</label>
-                <select
-                  className="w-full p-2 border border-gray-300 rounded-lg"
-                  value={selectedDestinationDepartment || ''}
-                  onChange={(e) => setSelectedDestinationDepartment(parseInt(e.target.value))}
-                >
-                  <option value="" disabled>Selecciona un departamento</option>
-                  {departments.map((department) => (
-                    <option key={department.id} value={department.id}>{department.name}</option>
-                  ))}
-                </select>
-                <select
-                  className="w-full p-2 border border-gray-300 rounded-lg mt-2"
-                  value={selectedDestinationCity}
-                  onChange={(e) => setSelectedDestinationCity(e.target.value)}
-                  disabled={!selectedDestinationDepartment}
-                >
-                  <option value="" disabled>Selecciona una ciudad</option>
-                  {destinationCities.map((city) => (
-                    <option key={city.id} value={city.name}>{city.name}</option>
-                  ))}
-                </select>
-              </div>
             </div>
-            {shippingCost !== null && (
-              <div className="mt-6">
-                <h3 className="text-xl font-semibold">Costo del envío: ${shippingCost}</h3>
-              </div>
-            )}
+            <div className="mt-6">
+              <label className="block text-gray-700">Costo del envío:</label>
+              <input
+                type="text"
+                value={shippingCost !== null ? `$${shippingCost}` : "Sin calcular"}
+                readOnly
+                className="w-full p-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-700"
+              />
+            </div>
+            <button
+              onClick={calculateDistanceAndCost}
+              className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition mt-4"
+            >
+              Calcular Costo
+            </button>
           </div>
           <div>
             <h2 className="text-2xl font-semibold mb-4">Datos del Remitente</h2>
@@ -295,6 +332,30 @@ const Shipment: React.FC = () => {
                   onChange={(e) => setPickupDate(e.target.value)}
                   min={today} // Establecer la fecha mínima como hoy
                 />
+              </div>
+              <div>
+                <label className="block text-gray-700">Departamento y Ciudad de destino</label>
+                <select
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  value={selectedDestinationDepartment || ''}
+                  onChange={(e) => setSelectedDestinationDepartment(parseInt(e.target.value))}
+                >
+                  <option value="" disabled>Selecciona un departamento</option>
+                  {departments.map((department) => (
+                    <option key={department.id} value={department.id}>{department.name}</option>
+                  ))}
+                </select>
+                <select
+                  className="w-full p-2 border border-gray-300 rounded-lg mt-2"
+                  value={selectedDestinationCity}
+                  onChange={(e) => setSelectedDestinationCity(e.target.value)}
+                  disabled={!selectedDestinationDepartment}
+                >
+                  <option value="" disabled>Selecciona una ciudad</option>
+                  {destinationCities.map((city) => (
+                    <option key={city.id} value={city.name}>{city.name}</option>
+                  ))}
+                </select>
               </div>
             </div>
           </div>
@@ -366,17 +427,7 @@ const Shipment: React.FC = () => {
                   checked={paymentMethod === 'pse'}
                   onChange={(e) => setPaymentMethod(e.target.value)}
                 />
-                <label className="ml-2 text-gray-700">PSE</label>
-              </div>
-              <div className="flex items-center">
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="tarjeta"
-                  checked={paymentMethod === 'tarjeta'}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
-                <label className="ml-2 text-gray-700">Tarjeta de Débito / Crédito</label>
+                <label className="ml-2 text-gray-700">Efectivo al Recoger</label>
               </div>
             </div>
             <button
@@ -386,10 +437,10 @@ const Shipment: React.FC = () => {
               Proceder con el pago
             </button>
           </div>
+          
         </div>
       </div>
     </div>
   );
-};
-
+}
 export default Shipment;
