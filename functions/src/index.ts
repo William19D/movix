@@ -2,6 +2,7 @@ import { onRequest } from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 import cors from "cors";
 import fetch from "node-fetch";
+import { v4 as uuidv4 } from 'uuid';
 
 const corsHandler = cors({ origin: true });
 
@@ -67,6 +68,17 @@ const calcularCostoPorRangos = (distancia: number, peso: number, tamano: number,
   return Math.round(costoTotal);
 };
 
+// Bloque de código para generar el código de seguimiento a un envío
+const generarCodigoSeguimeinto= () : string =>{
+  const uuid = uuidv4().split('-')[0].toUpperCase(); //identificador único universla
+  const tiempo = Date.now().toString().slice(-5);// da algo de orden cronológcio
+  return `Código de envío : CDE-${uuid}-${tiempo}`;
+}
+for (let i = 0; i < 5; i++) {
+  console.log(generarCodigoSeguimeinto());
+}
+
+// Función 
 export const calcularCostoEnvio = onRequest(async (request, response) => {
   corsHandler(request, response, async () => {
     logger.info("Solicitud recibida para calcular costo de envío", {
