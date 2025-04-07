@@ -40,6 +40,10 @@ const TopbarUser: React.FC = () => {
     setMenuOpen(!menuOpen);
   };
 
+  const handleCotizarClick = () => {
+    navigate('/cotizar');
+  };
+
   return (
     <div className="flex items-center justify-between p-2.5 px-5 bg-white shadow-md">
       <div className="flex items-center ml-[11%]" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
@@ -47,8 +51,8 @@ const TopbarUser: React.FC = () => {
         <h2 className="text-[5vh] m-0 font-bold">Movix</h2>
       </div>
       <div className="flex items-center gap-[5vh]">
-        <a href="#cotizar" className="text-black text-[2vh] no-underline hover:underline">Cotizar</a>
-        <a href="#rastrear" className="text-black text-[2vh] no-underline hover:underline">Rastrear</a>
+        <a href="#cotizar" className="text-black text-[2vh] no-underline hover:underline"onClick={handleCotizarClick}>Cotizar</a>
+        <a href="#rastrear" className="text-black text-[2vh] no-underline hover:underline" >Rastrear</a>
         <a href="#enviar" className="text-black text-[2vh] no-underline hover:underline">Enviar</a>
         <a href="#contactanos" className="text-black text-[2vh] no-underline hover:underline">Contáctanos</a>
       </div>

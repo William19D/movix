@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
-const Home: React.FC = () => {
+const Admin: React.FC = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState<string | null>(null);
 
@@ -23,9 +23,9 @@ const Home: React.FC = () => {
     navigate(path);
   };
 
- /* const handleCreateShipment = () => {
+  const handleCreateShipment = () => {
     handleNavigation('/shipment');
-  };*/
+  };
 
   return (
     <>
@@ -33,20 +33,18 @@ const Home: React.FC = () => {
         <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md text-center">
           <h2 className="text-3xl font-semibold mb-4">Hola {userName}</h2>
           <p className="text-gray-500 text-lg mb-6">Bienvenido a tu página de inicio</p>
-          {/*
           <button
             onClick={handleCreateShipment}
             className="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition"
           >
-             Crear envío
+            Crear envío
           </button>
-          */}
           <div className="space-y-4 mt-6">
             <button
               onClick={() => handleNavigation('/recoger-paquete')}
               className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
             >
-              Solicitar recogida de un paquete
+              Recoger un paquete
             </button>
             <button
               onClick={() => handleNavigation('/consultar-envios')}
@@ -73,4 +71,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default Admin;
