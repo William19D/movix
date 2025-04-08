@@ -14,6 +14,7 @@ import Shipment from "../pages/Register-Shipment/shipment";
 import Cotizar from "../pages/Cotizar/Cotizar";
 import Admin from "../pages/Admin/Admin";
 import CotizarAdmin from "../pages/Cotizar/CotizarAdmdin";
+import Footer from "../components/Footer"; // Make sure Footer is imported
 
 const AppContent: React.FC = () => {
   const location = useLocation();
@@ -25,7 +26,7 @@ const AppContent: React.FC = () => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setIsAuthenticated(true);
-        setIsAdmin(user.email === "admin@gmail.com"); // Ajusta el correo según tu lógica
+        setIsAdmin(user.email === "admin@gmail.com"); // Adjust logic as needed
       } else {
         setIsAuthenticated(false);
         setIsAdmin(false);
@@ -36,38 +37,43 @@ const AppContent: React.FC = () => {
     return () => unsubscribe();
   }, []);
 
+  // Define routes where the Footer should NOT appear
+  const excludedFooterRoutes: string[] = ["/login", "/register", "/shipment"];
+
+  // Define routes where the Topbar should NOT appear
   const noTopbarRoutes: string[] = ["/home", "/admin-dashboard", "/shipment"];
 
   if (loading) return <div>Cargando...</div>;
 
   return (
-    <div>
-      {/* Si es admin y está en /admin-dashboard */}
+    <div className="min-h-screen flex flex-col">
+      {/* Topbar logic */}
       {isAuthenticated && isAdmin && location.pathname === "/admin-dashboard" && (
         <TopbarAdmin />
       )}
 
-      {/* Si es usuario autenticado (NO admin) */}
-      {isAuthenticated && !isAdmin && (
-        <TopbarUser />
-      )}
+      {isAuthenticated && !isAdmin && <TopbarUser />}
 
-      {/* Si no está autenticado y la ruta no está en la lista */}
       {!isAuthenticated && !noTopbarRoutes.includes(location.pathname) && (
         <Topbar />
       )}
 
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/shipment" element={<Shipment />} />
-        <Route path="/cotizar" element={<Cotizar />} />
-        <Route path="/admin-dashboard" element={<Admin />} />
-        <Route path="/cotizar-admin" element={<CotizarAdmin />} />
+      {/* Main application content */}
+      <div className="flex-grow">
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/shipment" element={<Shipment />} />
+          <Route path="/cotizar" element={<Cotizar />} />
+          <Route path="/admin-dashboard" element={<Admin />} />
+          <Route path="/cotizar-admin" element={<CotizarAdmin />} />
+        </Routes>
+      </div>
 
-      </Routes>
+      {/* Footer logic */}
+      {!excludedFooterRoutes.includes(location.pathname) && <Footer />}
     </div>
   );
 };
