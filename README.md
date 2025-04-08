@@ -1,54 +1,50 @@
-# React + TypeScript + Vite
+# 🚚 Movix - Plataforma de Envíos
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Movix** es una moderna plataforma web que facilita la gestión integral de servicios de envío. La plataforma permite a los usuarios registrarse, solicitar recogidas, hacer seguimiento en tiempo real y a los administradores controlar el estado de cada pedido.
 
-Currently, two official plugins are available:
+## ✨ Tecnologías Usadas
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Este proyecto fue desarrollado con el siguiente stack tecnológico:
 
-## Expanding the ESLint configuration
+- ⚛️ **React** + **TypeScript** – Frontend moderno, tipado y mantenible.
+- ⚡ **Vite** – Empaquetador ultrarrápido para desarrollo y producción.
+- 🎨 **Tailwind CSS** – Utilidades para estilos rápidos, responsivos y personalizables.
+- 🔥 **Firebase** – Backend as a Service para:
+  - Autenticación (Firebase Auth)
+  - Base de datos en tiempo real (Firestore)
+  - Hosting (opcional)
+  - Cloud Functions (opcional)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🔐 Funcionalidades
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+### 🧑‍💼 Usuario
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- Registro e inicio de sesión con autenticación segura vía Firebase Auth.
+- Solicitud de recogida de paquetes: dirección de origen, destino, peso, etc.
+- Visualización de estado actual del pedido.
+- Tracking en tiempo real del envío.
+- Historial de pedidos anteriores.
+- Edición de perfil y datos de contacto.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 🛠 Administrador
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+- Panel de administración con login restringido.
+- Visualización de todos los pedidos activos y completados.
+- Cambio del estado del pedido: `Pendiente` → `Recogido` → `En tránsito` → `Entregado`.
+- Gestión de usuarios registrados.
+- Notificaciones internas o por correo electrónico (opcional, vía Firebase Functions).
+
+### 🧩 Extra
+
+- Diseño responsive adaptado a móviles, tabletas y escritorio.
+- Animaciones suaves y experiencia fluida.
+- Validación de formularios y mensajes de error amigables.
+- Modo oscuro (opcional en configuración del usuario).
+
+
+## 🚀 Instalación
+
+1. Clona el repositorio:
+
+```bash
+git clone https://github.com/William19D/movix.git
