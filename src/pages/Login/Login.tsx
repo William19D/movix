@@ -6,10 +6,9 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   getRedirectResult,
-  onAuthStateChanged // Añade esto
+  onAuthStateChanged
 } from 'firebase/auth';
 import { motion, AnimatePresence } from "framer-motion";
-
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -66,7 +65,6 @@ export default function LoginForm() {
     }
   };
 
-
   // Función para manejar errores
   const handleAuthError = (error: any) => {
     console.error('Error de autenticación:', error.code, error.message);
@@ -117,10 +115,11 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
+      {/* Error Modal */}
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -148,37 +147,50 @@ export default function LoginForm() {
         )}
       </AnimatePresence>
 
-      <div className="flex bg-white p-8 rounded-2xl shadow-lg w-3/4">
-        <div className="flex flex-col items-start justify-center w-1/2 pr-8">
-          <h2 className="text-3xl font-semibold mb-4">Bienvenido a Movix</h2>
-          <p className="text-gray-500 text-lg mb-4">
+      {/* Main Login Container */}
+      <div className="flex flex-col lg:flex-row bg-white rounded-2xl shadow-lg w-full max-w-5xl overflow-hidden">
+        {/* Left Column - Illustration (hidden on mobile) */}
+        <div className="hidden sm:flex flex-col items-start justify-center lg:w-1/2 p-6 lg:p-8">
+          <h2 className="text-2xl md:text-3xl font-semibold mb-4">Bienvenido a Movix</h2>
+          <p className="text-gray-500 text-base md:text-lg mb-4">
             Inicia sesión para gestionar tus envíos y rastrear tus paquetes de manera sencilla y rápida.
           </p>
-          <img src="login.svg" alt="Logística" className="w-full h-80" />
+          <img src="login.svg" alt="Logística" className="w-full h-auto max-h-80 lg:max-h-96 object-contain" />
         </div>
 
-        <div className="flex flex-col items-center justify-center w-1/2">
+        {/* Right Column - Login Form */}
+        <div className="flex flex-col items-center justify-center w-full lg:w-1/2 p-6 lg:p-8">
+          {/* Mobile Welcome Message (shown only on small screens) */}
+          <div className="sm:hidden text-center mb-6 w-full">
+            <h2 className="text-2xl font-semibold mb-2">Bienvenido a Movix</h2>
+            <p className="text-gray-500 text-sm mb-4">
+              Inicia sesión para gestionar tus envíos
+            </p>
+          </div>
+          
+          {/* User Photo and Login Title */}
           <div className="flex flex-col items-center mb-6">
-             {userPhoto ? (
-          <img 
-            src={userPhoto} 
-            alt="Foto de perfil" 
-            className="w-16 h-16 rounded-full mb-4 object-cover"
-            referrerPolicy="no-referrer" // Para evitar problemas con imágenes de Google
-          />
-        ) : (
-          <div className="w-16 h-16 bg-gray-300 rounded-full mb-4" />
-        )}
+            {userPhoto ? (
+              <img 
+                src={userPhoto} 
+                alt="Foto de perfil" 
+                className="w-16 h-16 rounded-full mb-4 object-cover"
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <div className="w-16 h-16 bg-gray-300 rounded-full mb-4" />
+            )}
             <h2 className="text-2xl font-semibold">Iniciar sesión</h2>
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-500 text-sm text-center">
               ¿No tienes una cuenta?{' '}
-              <button onClick={handleRegisterClick} className="text-blue-600 hover:text-blue-800">
+              <button onClick={handleRegisterClick} className="text-[#1C8E19] hover:text-blue-800">
                 Regístrate
               </button>
             </p>
           </div>
 
-          <div className="mt-6 space-y-3 w-full">
+          {/* Google Sign-in Button */}
+          <div className="mt-4 space-y-3 w-full max-w-md">
             <button
               onClick={signInWithGoogle}
               disabled={googleLoading}
@@ -200,13 +212,15 @@ export default function LoginForm() {
             </button>
           </div>
 
-          <div className="flex items-center my-6 w-full">
+          {/* Divider */}
+          <div className="flex items-center my-4 w-full max-w-md">
             <hr className="flex-grow border-gray-300" />
-            <span className="mx-3 text-gray-400">O</span>
+            <span className="mx-3 text-gray-400 text-sm">O</span>
             <hr className="flex-grow border-gray-300" />
           </div>
 
-          <form onSubmit={handleEmailLogin} className="space-y-4 w-full">
+          {/* Email & Password Form */}
+          <form onSubmit={handleEmailLogin} className="space-y-4 w-full max-w-md">
             <div>
               <label className="text-sm text-gray-600">Tu correo electrónico</label>
               <input
@@ -239,14 +253,14 @@ export default function LoginForm() {
             </div>
             
             <div className="text-right text-sm">
-              <a href="#" className="text-blue-600 hover:text-blue-800">
+              <a href="#" className="text-[#1C8E19] hover:text-blue-800">
                 ¿Olvidaste tu contraseña?
               </a>
             </div>
             
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg transition-colors duration-300"
+              className="w-full bg-[#5EEB5B] hover:bg-[#3BD838] text-black p-3 rounded-lg transition-colors duration-300"
             >
               Iniciar sesión
             </button>

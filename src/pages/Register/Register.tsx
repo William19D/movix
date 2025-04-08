@@ -5,7 +5,6 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { collection, doc, setDoc } from 'firebase/firestore';
 import { motion, AnimatePresence } from "framer-motion";
 
-
 interface Option {
     value: number;
     label: string;
@@ -19,9 +18,35 @@ const Register: React.FC = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false); // Nuevo estado
-    const [error, setError] = useState<string | null>(null); // Nuevo estado para el error
-    const [isModalOpen, setIsModalOpen] = useState(false); // Nuevo estado para el modal
+    const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // Custom styles for react-select
+    const customStyles = {
+        control: (provided: any) => ({
+            ...provided,
+            borderColor: '#d1d5db',
+            borderRadius: '0.5rem',
+            padding: '0.25rem',
+            boxShadow: 'none',
+            '&:hover': {
+                borderColor: '#C3E956'
+            },
+            '&:focus': {
+                borderColor: '#C3E956',
+                boxShadow: '0 0 0 1px #C3E956'
+            }
+        }),
+        option: (provided: any, state: any) => ({
+            ...provided,
+            backgroundColor: state.isSelected ? '#C3E956' : state.isFocused ? '#ddeea1' : null,
+            color: state.isSelected ? 'black' : 'inherit',
+            '&:active': {
+                backgroundColor: '#C3E956'
+            }
+        })
+    };
 
     useEffect(() => {
         // Obtener la lista de departamentos de Colombia
@@ -58,11 +83,11 @@ const Register: React.FC = () => {
     }, [selectedDepartment]);
 
     const cleanUpForm = () => {
-      setName('');
-      setEmail('');
-      setPassword('');
-      setSelectedDepartment(null);
-      setSelectedCity(null);
+        setName('');
+        setEmail('');
+        setPassword('');
+        setSelectedDepartment(null);
+        setSelectedCity(null);
     };
     
     const handleDepartmentChange = (selectedOption: SingleValue<Option>) => {
@@ -75,31 +100,31 @@ const Register: React.FC = () => {
     };
 
     const registerUser = async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!name || !email || !password || !selectedDepartment || !selectedCity) {
-        setError("Por favor, completa todos los campos obligatorios.");
-        setIsModalOpen(true);
-        return; // Detiene la ejecución si hay campos vacíos
-    }
-      try {
-          // Crea el usuario en Firebase Authentication
-          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-          const user = userCredential.user;
-  
-          if (user) {
-              // Guarda los datos adicionales en Cloud Firestore
-              const clientsCollection = collection(db, 'clientes');
-              const userDocRef = doc(clientsCollection, user.uid);
-              await setDoc(userDocRef, {
-                  name: name, // Usamos la variable name del estado
-                  email: email, // Usamos la variable email del estado
-                  department: selectedDepartment?.label || '',
-                  city: selectedCity?.label || '',
-              });
-              console.log('Usuario registrado con éxito');
-              cleanUpForm();
+        e.preventDefault();
+        if (!name || !email || !password || !selectedDepartment || !selectedCity) {
+            setError("Por favor, completa todos los campos obligatorios.");
+            setIsModalOpen(true);
+            return; // Detiene la ejecución si hay campos vacíos
+        }
+        try {
+            // Crea el usuario en Firebase Authentication
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+    
+            if (user) {
+                // Guarda los datos adicionales en Cloud Firestore
+                const clientsCollection = collection(db, 'clientes');
+                const userDocRef = doc(clientsCollection, user.uid);
+                await setDoc(userDocRef, {
+                    name: name, // Usamos la variable name del estado
+                    email: email, // Usamos la variable email del estado
+                    department: selectedDepartment?.label || '',
+                    city: selectedCity?.label || '',
+                });
+                console.log('Usuario registrado con éxito');
+                cleanUpForm();
 
-          }
+            }
         } catch (error: any) { // Tipamos el error como `any` para acceder a sus propiedades
             let errorMessage = "Error al registrar usuario";
             
@@ -117,13 +142,11 @@ const Register: React.FC = () => {
         }
     };
 
-
-
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
             <AnimatePresence>
                 {isModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                         {/* Fondo con animación de fade */}
                         <motion.div
                             initial={{ opacity: 0 }}
@@ -144,7 +167,7 @@ const Register: React.FC = () => {
                             <p className="text-gray-700 mb-5">{error}</p>
                             <button
                                 onClick={() => setIsModalOpen(false)}
-                                className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                                className="w-full bg-[#C3E956] text-black py-2 rounded-lg hover:bg-[#B3D946] transition"
                             >
                                 Cerrar
                             </button>
@@ -152,42 +175,61 @@ const Register: React.FC = () => {
                     </div>
                 )}
             </AnimatePresence>
-            <div className="flex bg-white p-8 rounded-2xl shadow-lg w-3/4">
-                <div className="flex flex-col items-start justify-center w-1/2 pr-8">
-                    <h2 className="text-3xl font-semibold mb-4">Bienvenido a Movix</h2>
-                    <p className="text-gray-500 text-lg mb-4">Regístrate para empezar a gestionar tus envíos y rastrear tus paquetes de manera sencilla y rápida.</p>
-                    <img src="register.jpg" alt="Registro" className="w-full h-auto" />
+
+            <div className="flex flex-col md:flex-row bg-white p-5 md:p-8 rounded-2xl shadow-lg w-full max-w-5xl">
+                {/* Left column (image and welcome text) - hidden on mobile, shown on medium screens and up */}
+                <div className="hidden md:flex flex-col items-start justify-center md:w-1/2 md:pr-8 mb-6 md:mb-0">
+                    <h2 className="text-2xl md:text-3xl font-semibold mb-4">Bienvenido a Movix</h2>
+                    <p className="text-gray-500 text-base md:text-lg mb-6">Regístrate para empezar a gestionar tus envíos y rastrear tus paquetes de manera sencilla y rápida.</p>
+                    <img src="register.jpg" alt="Registro" className="w-full h-auto rounded-lg" />
                 </div>
-                <div className="flex flex-col items-center justify-center w-1/2">
+
+                {/* Right column (form) - full width on mobile, half width on medium screens and up */}
+                <div className="flex flex-col items-center justify-center w-full md:w-1/2">
+                    {/* Mobile welcome header - shown only on mobile */}
+                    <div className="md:hidden text-center mb-6 w-full">
+                        <h2 className="text-2xl font-semibold mb-2">Bienvenido a Movix</h2>
+                        <p className="text-gray-500 text-sm">Regístrate para empezar a gestionar tus envíos</p>
+                    </div>
+
                     <div className="flex flex-col items-center mb-6">
                         <h2 className="text-2xl font-semibold">Registrarse</h2>
                         <p className="text-gray-500 text-sm">Crea una cuenta para comenzar</p>
                     </div>
 
-                    <form className="space-y-4 w-full" onSubmit={registerUser}>
+                    <form className="space-y-4 w-full max-w-md" onSubmit={registerUser}>
                         <div>
                             <label className="text-sm text-gray-600">Nombre</label>
-                            <input type="text" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value={name} onChange={(e) => setName(e.target.value)}  />
+                            <input 
+                                type="text" 
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C3E956]" 
+                                value={name} 
+                                onChange={(e) => setName(e.target.value)}
+                            />
                         </div>
                         <div>
                             <label className="text-sm text-gray-600">Correo electrónico</label>
-                            <input type="email" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value={email} onChange={(e) => setEmail(e.target.value)}  />
+                            <input 
+                                type="email" 
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C3E956]" 
+                                value={email} 
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
                         </div>
                         <div>
                             <label className="text-sm text-gray-600">Contraseña</label>
                             <div className="relative">
                                 <input
                                     type={showPassword ? "text" : "password"}
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C3E956]"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    
                                 />
                                 <span
                                     className="absolute inset-y-0 right-3 flex items-center text-gray-400 cursor-pointer"
                                     onClick={() => setShowPassword(!showPassword)}
                                 >
-                                    {showPassword ? '👁️' : '👁️‍🗨️'} {/* Opcional: puedes cambiar el ícono según el estado */}
+                                    {showPassword ? '👁️' : '👁️‍🗨️'}
                                 </span>
                             </div>
                         </div>
@@ -198,6 +240,8 @@ const Register: React.FC = () => {
                                 value={selectedDepartment}
                                 onChange={handleDepartmentChange}
                                 className="w-full"
+                                styles={customStyles}
+                                placeholder="Selecciona un departamento"
                             />
                         </div>
                         <div>
@@ -208,13 +252,21 @@ const Register: React.FC = () => {
                                 onChange={handleCityChange}
                                 className="w-full"
                                 isDisabled={!selectedDepartment}
+                                styles={customStyles}
+                                placeholder={selectedDepartment ? "Selecciona un municipio" : "Primero selecciona un departamento"}
                             />
                         </div>
-                        <button className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600" type="submit">Registrarse</button>
+                        <button 
+                            className="w-full bg-[#C3E956] text-black p-3 rounded-lg hover:bg-[#B3D946] transition-colors duration-300" 
+                            type="submit"
+                        >
+                            Registrarse
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
     );
 }
+
 export default Register;
