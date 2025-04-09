@@ -14,7 +14,8 @@ import Shipment from "../pages/Register-Shipment/shipment";
 import Cotizar from "../pages/Cotizar/Cotizar";
 import Admin from "../pages/Admin/Admin";
 import CotizarAdmin from "../pages/Cotizar/CotizarAdmdin";
-import Footer from "../components/Footer"; // Make sure Footer is imported
+import Footer from "../components/footer"; // Make sure Footer is imported
+import Rastrear from "../pages/Rastrear/Rastrear";
 
 const AppContent: React.FC = () => {
   const location = useLocation();
@@ -69,6 +70,7 @@ const AppContent: React.FC = () => {
           <Route path="/cotizar" element={<Cotizar />} />
           <Route path="/admin-dashboard" element={<Admin />} />
           <Route path="/cotizar-admin" element={<CotizarAdmin />} />
+          <Route path="/rastrear" element={<Rastrear />} />
         </Routes>
       </div>
 
