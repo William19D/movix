@@ -3,6 +3,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../../../firebase'; // Asegúrate de importar tus configuraciones de Firebase
 import { useNavigate } from 'react-router-dom';
+import {Notify} from '../../../components/Notify'; 
 
 interface UserData {
   name: string;
@@ -16,6 +17,7 @@ const UserProfilePage = () => {
   const [profilePhoto, setProfilePhoto] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+   const [showNotify, setShowNotify] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -79,31 +81,39 @@ const UserProfilePage = () => {
   if (!userData) {
     return <div>Error al cargar los datos del usuario</div>;
   }
+  const handleNotify = () => {
+    setShowNotify(true);
+    setTimeout(() => setShowNotify(false), 1500);
+  };
+
 
   const profileActions = [
     { 
       name: "Editar Perfil", 
       icon: "✏️", 
       color: "bg-blue-500 hover:bg-blue-600", 
-      onClick: () => console.log("Editar perfil") 
+      onClick: () => {
+        console.log("Editar perfil"), 
+        handleNotify();
+      }
     },
     { 
       name: "Cambiar Contraseña", 
       icon: "🔒", 
       color: "bg-purple-500 hover:bg-purple-600", 
-      onClick: () => console.log("Cambiar contraseña") 
+      onClick: () => {
+        console.log("Cambiar contraseña") 
+        handleNotify();
+      }
     },
     { 
       name: "Configuración", 
       icon: "⚙️", 
       color: "bg-yellow-500 hover:bg-yellow-600", 
-      onClick: () => console.log("Configuración") 
-    },
-    { 
-      name: "Cerrar Sesión", 
-      icon: "🚪", 
-      color: "bg-red-500 hover:bg-red-600", 
-      onClick: () => auth.signOut().then(() => navigate('/login')) 
+      onClick: () => {
+        console.log("Configuración") 
+        handleNotify();
+      }
     },
   ];
   const handleRegresarClick = () => {
@@ -122,14 +132,6 @@ const UserProfilePage = () => {
             Administra tu información personal y configuración
           </p>
         </div>
-
-        
-  
-        
-       
-       
-        
-
         {/* Contenido principal */}
         <div className="bg-white rounded-xl shadow-xl overflow-hidden">
           <div className="p-6 md:p-8 lg:p-10">
@@ -159,10 +161,8 @@ const UserProfilePage = () => {
                     onClick={handleRegresarClick}
                   >
                     Regresar
-                  </button>
-              
-                </div>
-                
+                  </button>    
+                </div>      
                 <div className="mt-4 space-y-3">
                   <div className="flex items-center">
                     <span className="text-gray-500 w-32">Email:</span>
@@ -218,7 +218,7 @@ const UserProfilePage = () => {
             {/* Acciones de perfil */}
             <div>
               <h3 className="text-xl font-semibold text-gray-800 mb-4">Acciones</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {profileActions.map((action, index) => (
                   <button
                     key={index}
@@ -233,7 +233,9 @@ const UserProfilePage = () => {
             </div>
           </div>
         </div>
+        <Notify message="🚧 En desarrollo" show={showNotify} />
       </div>
+      
     </div>
   );
 };
