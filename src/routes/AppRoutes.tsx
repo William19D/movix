@@ -11,7 +11,7 @@ import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
 import Shipment from "../pages/Register-Shipment/shipment";
 import Cotizar from "../pages/Cotizar/Cotizar";
-import Admin from "../pages/Admin/Admin";
+import AdminDashboard from "../pages/Admin/Dashboard/AdminDashboard";
 import CotizarAdmin from "../pages/Cotizar/CotizarAdmdin";
 import Footer from "../components/footer"; // Make sure Footer is imported
 import Profile from "../pages/User/Profile/Profile"
@@ -68,15 +68,12 @@ const AppContent: React.FC = () => {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-
           <Route path="/User-dashboard" element={<Dashboard />} />
-          
           <Route path="/shipment" element={<Shipment />} />
           <Route path="/cotizar" element={<Cotizar />} />
-          <Route path="/admin-dashboard" element={<Admin />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/cotizar-admin" element={<CotizarAdmin />} />
           <Route path="/profile" element={<Profile />} />
-
           <Route path="/rastrear" element={<Rastrear />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/rastrear" element={<Rastrear />} />
