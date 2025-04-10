@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Select, { SingleValue } from 'react-select';
-import { auth, db } from '../../firebase';
+import { auth, db } from '../../../firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { collection, doc, setDoc } from 'firebase/firestore';
 import { motion, AnimatePresence } from "framer-motion";
