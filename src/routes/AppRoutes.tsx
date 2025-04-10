@@ -16,6 +16,8 @@ import CotizarAdmin from "../pages/Cotizar/CotizarAdmdin";
 import Footer from "../components/footer"; // Make sure Footer is imported
 import Profile from "../pages/User/Profile/Profile"
 import Dashboard from "../pages/User/Dashboard/Dashboard";
+import Rastrear from "../pages/Rastrear/Rastrear";
+import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
 
 const AppContent: React.FC = () => {
   const location = useLocation();
@@ -73,6 +75,9 @@ const AppContent: React.FC = () => {
           <Route path="/admin-dashboard" element={<Admin />} />
           <Route path="/cotizar-admin" element={<CotizarAdmin />} />
           <Route path="/profile" element={<Profile />} />
+
+          <Route path="/rastrear" element={<Rastrear />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
         </Routes>
       </div>
 
