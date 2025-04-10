@@ -114,6 +114,10 @@ export default function LoginForm() {
     navigate('/register');
   };
 
+  const handleForgotPasswordClick = () => {
+    navigate('/forgot-password');
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
       {/* Error Modal */}
@@ -253,9 +257,13 @@ export default function LoginForm() {
             </div>
             
             <div className="text-right text-sm">
-              <a href="#" className="text-[#1C8E19] hover:text-blue-800">
+              <button
+                type="button"
+                onClick={handleForgotPasswordClick}
+                className="text-[#1C8E19] hover:text-blue-800"
+              >
                 ¿Olvidaste tu contraseña?
-              </a>
+              </button>
             </div>
             
             <button
