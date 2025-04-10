@@ -51,7 +51,8 @@ const AppContent: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Topbar logic */}
-      {isAuthenticated && isAdmin && location.pathname === "/admin-dashboard" && (
+      {isAuthenticated && isAdmin && 
+        (location.pathname === "/admin-dashboard" || location.pathname === "/cotizar-admin") && (
         <TopbarAdmin />
       )}
 
@@ -78,6 +79,9 @@ const AppContent: React.FC = () => {
 
           <Route path="/rastrear" element={<Rastrear />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/rastrear" element={<Rastrear />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          {/* Add more routes as needed */}
         </Routes>
       </div>
 
