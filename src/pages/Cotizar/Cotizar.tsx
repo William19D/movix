@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import Services from "../../core/services/services";
 
 const Cotizar: React.FC = () => {
-  const [length, setLength] = useState(0);
-  const [width, setWidth] = useState(0);
-  const [height, setHeight] = useState(0);
-  const [weight, setWeight] = useState(0);
-  const [declaredValue, setDeclaredValue] = useState(10000);
-  const [shippingType, setShippingType] = useState("standard");
+  const [length, setLength] = useState<string>("");
+  const [width, setWidth] = useState<string>("");
+  const [height, setHeight] = useState<string>("");
+  const [weight, setWeight] = useState<string>("");
+  const [declaredValue, setDeclaredValue] = useState<string>("10000");
+  const [shippingType, setShippingType] = useState("standard"); // Default to standard
   const [departments, setDepartments] = useState<any[]>([]);
   const [originCities, setOriginCities] = useState<any[]>([]);
   const [destinationCities, setDestinationCities] = useState<any[]>([]);
@@ -49,11 +49,11 @@ const Cotizar: React.FC = () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            length,
-            width,
-            height,
-            peso: weight,
-            valorDeclarado: declaredValue,
+            length: Number(length),
+            width: Number(width),
+            height: Number(height),
+            peso: Number(weight),
+            valorDeclarado: Number(declaredValue),
             origen: {
               ciudad: selectedOriginCity,
               departamento: departments.find(dep => dep.id === selectedOriginDepartment)?.name,
@@ -68,7 +68,7 @@ const Cotizar: React.FC = () => {
         const data = await response.json();
         if (response.ok) {
           let cost = data.costo;
-          if (shippingType === "urgent") cost += 2000;
+          if (shippingType === "urgent") cost += 2000; // Add $2000 for urgent shipping
           setShippingCost(Math.round(cost));
           setNotification({ type: "success", message: "Costo calculado exitosamente." });
         } else {
@@ -90,6 +90,10 @@ const Cotizar: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [notification]);
+
+  const handleInputChange = (value: string) => {
+    return value === "" || /^[0-9]*$/.test(value) ? value : "";
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
@@ -116,33 +120,32 @@ const Cotizar: React.FC = () => {
           {/* Paquete */}
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-gray-700">Detalles del Paquete</h2>
-            {/* Ancho, Largo, Alto in one line */}
             <div className="flex gap-4">
               <div className="flex-1 space-y-2">
                 <label className="block text-gray-600">Ancho (cm)</label>
                 <input
-                  type="number"
+                  type="text"
                   className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C3E956]"
                   value={width}
-                  onChange={(e) => setWidth(Number(e.target.value))}
+                  onChange={(e) => setWidth(handleInputChange(e.target.value))}
                 />
               </div>
               <div className="flex-1 space-y-2">
                 <label className="block text-gray-600">Largo (cm)</label>
                 <input
-                  type="number"
+                  type="text"
                   className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C3E956]"
                   value={length}
-                  onChange={(e) => setLength(Number(e.target.value))}
+                  onChange={(e) => setLength(handleInputChange(e.target.value))}
                 />
               </div>
               <div className="flex-1 space-y-2">
                 <label className="block text-gray-600">Alto (cm)</label>
                 <input
-                  type="number"
+                  type="text"
                   className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C3E956]"
                   value={height}
-                  onChange={(e) => setHeight(Number(e.target.value))}
+                  onChange={(e) => setHeight(handleInputChange(e.target.value))}
                 />
               </div>
             </div>
@@ -151,10 +154,10 @@ const Cotizar: React.FC = () => {
             <div className="space-y-2">
               <label className="block text-gray-600">Peso (kg)</label>
               <input
-                type="number"
+                type="text"
                 className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C3E956]"
                 value={weight}
-                onChange={(e) => setWeight(Number(e.target.value))}
+                onChange={(e) => setWeight(handleInputChange(e.target.value))}
               />
             </div>
 
@@ -162,33 +165,36 @@ const Cotizar: React.FC = () => {
             <div className="space-y-2">
               <label className="block text-gray-600">Valor declarado ($)</label>
               <input
-                type="number"
+                type="text"
                 className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C3E956]"
                 value={declaredValue}
-                onChange={(e) => setDeclaredValue(Number(e.target.value))}
+                onChange={(e) => setDeclaredValue(handleInputChange(e.target.value))}
               />
             </div>
 
             {/* Tipo de envío */}
-            <div className="flex gap-4 items-center">
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  value="standard"
-                  checked={shippingType === "standard"}
-                  onChange={(e) => setShippingType(e.target.value)}
-                />
-                Estándar
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  value="urgent"
-                  checked={shippingType === "urgent"}
-                  onChange={(e) => setShippingType(e.target.value)}
-                />
-                Urgente (+$2.000)
-              </label>
+            <div className="space-y-2">
+              <label className="block text-gray-600">Tipo de envío</label>
+              <div className="flex items-center gap-4">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    value="standard"
+                    checked={shippingType === "standard"}
+                    onChange={(e) => setShippingType(e.target.value)}
+                  />
+                  Estándar
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    value="urgent"
+                    checked={shippingType === "urgent"}
+                    onChange={(e) => setShippingType(e.target.value)}
+                  />
+                  Urgente (+$2.000)
+                </label>
+              </div>
             </div>
           </div>
 
@@ -199,11 +205,11 @@ const Cotizar: React.FC = () => {
               <label className="text-sm text-gray-600">Departamento de Origen</label>
               <select
                 className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C3E956]"
-                value={selectedOriginDepartment || ''}
-                onChange={e => setSelectedOriginDepartment(Number(e.target.value) || null)}
+                value={selectedOriginDepartment || ""}
+                onChange={(e) => setSelectedOriginDepartment(Number(e.target.value) || null)}
               >
                 <option value="">Selecciona</option>
-                {departments.map(dep => (
+                {departments.map((dep) => (
                   <option key={dep.id} value={dep.id}>
                     {dep.name}
                   </option>
@@ -212,10 +218,10 @@ const Cotizar: React.FC = () => {
               <select
                 className="w-full p-2 border border-gray-300 rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-[#C3E956]"
                 value={selectedOriginCity}
-                onChange={e => setSelectedOriginCity(e.target.value)}
+                onChange={(e) => setSelectedOriginCity(e.target.value)}
               >
                 <option value="">Ciudad de origen</option>
-                {originCities.map(city => (
+                {originCities.map((city) => (
                   <option key={city.id} value={city.name}>
                     {city.name}
                   </option>
@@ -227,11 +233,11 @@ const Cotizar: React.FC = () => {
               <label className="text-sm text-gray-600">Departamento de Destino</label>
               <select
                 className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C3E956]"
-                value={selectedDestinationDepartment || ''}
-                onChange={e => setSelectedDestinationDepartment(Number(e.target.value) || null)}
+                value={selectedDestinationDepartment || ""}
+                onChange={(e) => setSelectedDestinationDepartment(Number(e.target.value) || null)}
               >
                 <option value="">Selecciona</option>
-                {departments.map(dep => (
+                {departments.map((dep) => (
                   <option key={dep.id} value={dep.id}>
                     {dep.name}
                   </option>
@@ -240,10 +246,10 @@ const Cotizar: React.FC = () => {
               <select
                 className="w-full p-2 border border-gray-300 rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-[#C3E956]"
                 value={selectedDestinationCity}
-                onChange={e => setSelectedDestinationCity(e.target.value)}
+                onChange={(e) => setSelectedDestinationCity(e.target.value)}
               >
                 <option value="">Ciudad de destino</option>
-                {destinationCities.map(city => (
+                {destinationCities.map((city) => (
                   <option key={city.id} value={city.name}>
                     {city.name}
                   </option>
