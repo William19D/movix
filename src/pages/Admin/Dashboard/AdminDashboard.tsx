@@ -22,14 +22,6 @@ const Dashboard: React.FC = () => {
   }, [navigate]);
   
 
-  const handleNavigation = (path: string) => {
-    navigate(path);
-  };
-
-  const handleCreateShipment = () => {
-    handleNavigation('/shipment');
-  };
-
   const handleNotify = () => {
     setShowNotify(true);
     setTimeout(() => setShowNotify(false), 1500);

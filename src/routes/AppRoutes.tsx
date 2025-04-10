@@ -10,9 +10,9 @@ import TopbarAdmin from "../components/TopBarAdmin";
 import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
 import Shipment from "../pages/Register-Shipment/shipment";
-import Cotizar from "../pages/Cotizar/Cotizar";
+import Cotizar from "../pages/User/Quote/Quote";
 import AdminDashboard from "../pages/Admin/Dashboard/AdminDashboard";
-import CotizarAdmin from "../pages/Cotizar/CotizarAdmdin";
+import CotizarAdmin from "../pages/Admin/Quote/QuoteAdmin";
 import Footer from "../components/footer"; // Make sure Footer is imported
 import Profile from "../pages/User/Profile/Profile"
 import Dashboard from "../pages/User/Dashboard/Dashboard";
