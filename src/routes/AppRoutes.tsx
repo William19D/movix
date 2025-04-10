@@ -9,12 +9,13 @@ import TopbarUser from "../components/TopBarUser";
 import TopbarAdmin from "../components/TopBarAdmin";
 import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
-import Home from "../pages/Home/Home";
 import Shipment from "../pages/Register-Shipment/shipment";
 import Cotizar from "../pages/Cotizar/Cotizar";
 import Admin from "../pages/Admin/Admin";
 import CotizarAdmin from "../pages/Cotizar/CotizarAdmdin";
-import Footer from "../components/Footer"; // Make sure Footer is imported
+import Footer from "../components/footer"; // Make sure Footer is imported
+import Profile from "../pages/User/Profile/Profile"
+import Dashboard from "../pages/User/Dashboard/Dashboard";
 
 const AppContent: React.FC = () => {
   const location = useLocation();
@@ -64,11 +65,14 @@ const AppContent: React.FC = () => {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/home" element={<Home />} />
+
+          <Route path="/User-dashboard" element={<Dashboard />} />
+          
           <Route path="/shipment" element={<Shipment />} />
           <Route path="/cotizar" element={<Cotizar />} />
           <Route path="/admin-dashboard" element={<Admin />} />
           <Route path="/cotizar-admin" element={<CotizarAdmin />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>
 

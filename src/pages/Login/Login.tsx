@@ -57,7 +57,7 @@ export default function LoginForm() {
       if (result.user?.photoURL) {
         setUserPhoto(result.user.photoURL);
       }
-      navigate('/home');
+      navigate('/User-dashboard');
     } catch (error: any) {
       handleAuthError(error);
     } finally {
@@ -103,7 +103,7 @@ export default function LoginForm() {
         navigate('/admin-dashboard');
       }
       else{
-        navigate('/home');
+        navigate('/User-dashboard');
       }
     } catch (error: any) {
       handleAuthError(error);

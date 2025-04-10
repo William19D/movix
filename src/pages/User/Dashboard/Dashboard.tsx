@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth } from '../../firebase';
+import { auth } from '../../../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import {Notify} from '../../components/Notify'; 
+import {Notify} from '../../../components/Notify'; 
 
-const Home = () => {
+const Dashboard = () => {
 
 
 
@@ -96,7 +96,7 @@ const Home = () => {
                 <button
                   key={index}
                   onClick={feature.onClick}
-                  className={`${feature.color} text-white w-full h-28 md:h-32 py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] flex flex-col items-center justify-center space-y-2 group`}
+                  className={`${feature.color} text-white w-full h-28 md:h-32 py-2 px-4 rounded-lg transition-all cursor-pointer duration-200 transform hover:scale-[1.02] flex flex-col items-center justify-center space-y-2 group`}
                 >
                   <span className="text-4xl md:text-6xl transition-transform duration-200 group-hover:scale-110">
                     {feature.icon}
@@ -116,4 +116,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Dashboard;
