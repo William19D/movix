@@ -6,19 +6,14 @@ import Notify from '../components/Notify';
 
 const TopbarAdmin: React.FC = () => {
   const navigate = useNavigate();
-  const [userName, setUserName] = useState<string | null>(null);
-  const [userPhoto, setUserPhoto] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [showNotify, setShowNotify] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setUserName(user.displayName || user.email);
-        setUserPhoto(user.photoURL);
+
       } else {
-        setUserName(null);
-        setUserPhoto(null);
         navigate('/login');
       }
     });
