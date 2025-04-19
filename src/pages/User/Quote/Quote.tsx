@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import Services from "../../core/services/services";
+import Services from "../../../core/services/services";
 
-const CotizarAdmin: React.FC = () => {
+const Cotizar: React.FC = () => {
   const [length, setLength] = useState<string>("");
   const [width, setWidth] = useState<string>("");
   const [height, setHeight] = useState<string>("");
@@ -26,12 +26,18 @@ const CotizarAdmin: React.FC = () => {
   useEffect(() => {
     if (selectedOriginDepartment) {
       Services.getCitiesByDepartment(selectedOriginDepartment).then(setOriginCities);
+    } else {
+      setOriginCities([]); // Clear cities if no department is selected
+      setSelectedOriginCity(""); // Clear selected city
     }
   }, [selectedOriginDepartment]);
 
   useEffect(() => {
     if (selectedDestinationDepartment) {
       Services.getCitiesByDepartment(selectedDestinationDepartment).then(setDestinationCities);
+    } else {
+      setDestinationCities([]); // Clear cities if no department is selected
+      setSelectedDestinationCity(""); // Clear selected city
     }
   }, [selectedDestinationDepartment]);
 
@@ -219,6 +225,7 @@ const CotizarAdmin: React.FC = () => {
                 className="w-full p-2 border border-gray-300 rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-[#C3E956]"
                 value={selectedOriginCity}
                 onChange={(e) => setSelectedOriginCity(e.target.value)}
+                disabled={!selectedOriginDepartment}
               >
                 <option value="">Ciudad de origen</option>
                 {originCities.map((city) => (
@@ -247,6 +254,7 @@ const CotizarAdmin: React.FC = () => {
                 className="w-full p-2 border border-gray-300 rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-[#C3E956]"
                 value={selectedDestinationCity}
                 onChange={(e) => setSelectedDestinationCity(e.target.value)}
+                disabled={!selectedDestinationDepartment}
               >
                 <option value="">Ciudad de destino</option>
                 {destinationCities.map((city) => (
@@ -305,4 +313,4 @@ const CotizarAdmin: React.FC = () => {
   );
 };
 
-export default CotizarAdmin;
+export default Cotizar;

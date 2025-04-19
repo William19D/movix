@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Services from '../../core/services/services';
+import Services from '../../../core/services/services';
 
 const Shipment: React.FC = () => {
   const [length, setLength] = useState<number>(0);
