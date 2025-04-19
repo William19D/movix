@@ -10,7 +10,6 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        const nameFromEmail = user.email ? user.email.split('@')[0] : '';
       } else {
         navigate('/login');
       }

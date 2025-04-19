@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../../../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import {Notify} from '../../../components/Notify'; 
+import { useEffect, useState } from 'react';
 
 const Dashboard = () => {
-
 
 
 
@@ -26,9 +25,6 @@ const Dashboard = () => {
     return () => unsubscribe();
   }, [navigate]);
 
-  const handleNavigation = (path: string) => {
-    navigate(path);
-  };
 
   const handleNotify = () => {
     setShowNotify(true);
