@@ -6,7 +6,7 @@ import { Notify } from '../../../components/Notify'
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const [userName, setUserName] = useState<string | null>(null);
+  const [setUserName] = useState<string | null>(null);
   const [showNotify, setShowNotify] = useState(false);
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
