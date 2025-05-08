@@ -22,10 +22,6 @@ const Home: React.FC = () => {
     return () => unsubscribe();
   }, [navigate]);
 
-  const handleNavigation = (path: string) => {
-    navigate(path);
-  };
-
   const handleNotify = () => {
     setShowNotify(true);
     setTimeout(() => setShowNotify(false), 1500);
