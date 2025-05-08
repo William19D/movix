@@ -6,7 +6,6 @@ import Notify from '../components/Notify';
 
 const TopbarAdmin: React.FC = () => {
   const navigate = useNavigate();
-  const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [showNotify, setShowNotify] = useState(false);
 
   useEffect(() => {
