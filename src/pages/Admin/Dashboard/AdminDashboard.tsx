@@ -10,9 +10,11 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-      }      } else {
+      }  
+      else {
         navigate('/login');
       }
+    }
     });
   
     return () => unsubscribe();
