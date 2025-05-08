@@ -6,14 +6,11 @@ import { Notify } from '../../../components/Notify'
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const [setUserName] = useState<string | null>(null);
   const [showNotify, setShowNotify] = useState(false);
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        const nameFromEmail = user.email ? user.email.split('@')[0] : '';
-        setUserName(user.displayName || nameFromEmail);
-      } else {
+      }      } else {
         navigate('/login');
       }
     });
