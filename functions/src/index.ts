@@ -168,5 +168,20 @@ export const getCliente = onRequest(async (req, res) => {
 });
 
 
+export const desactivarCuentaCliente = async (id: string) => {
+  try {
+    
+    const cliente = db.collection('clientes').doc(id);
+    
+    await cliente.update({
+      estadoCuenta: false
+    });
+
+    return { message: 'Cuenta desactivada exitosamente' };
+  } catch (error) {
+    console.error('Error desactivando la cuenta:', error);
+    throw new Error('Error al desactivar la cuenta');
+  }
+};
 
 
