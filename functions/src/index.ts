@@ -117,3 +117,56 @@ export const registrarEnvio = onRequest(async (req, res) => {
     res.status(500).send("Error al registrar el envío");
   }
 });
+
+export const obtenerCliente = async (id : any) => {
+  try {
+    
+    const clientRef = db.collection('clientes').doc(id);
+    const doc = await clientRef.get();
+
+    if (!doc.exists) {
+      throw new Error('Cliente no encontrado');
+    }
+
+    return doc.data(); 
+  } catch (error) {
+    console.error('Error obteniendo los datos del cliente:', error);
+    throw error;
+  }
+};
+
+
+export const getCliente = onRequest(async (req, res) => {
+  
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Origin', '*'); 
+    res.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.set('Access-Control-Max-Age', '3600');
+    res.status(204).send('');
+    return;
+  }
+
+  // CORS para solicitudes GET normales
+  res.set('Access-Control-Allow-Origin', '*'); 
+
+  try {
+    const { id } = req.params; // obtengan el id desde los parámetros de la url
+
+    if (!id) {
+      res.status(400).send("El ID del cliente es requerido");
+      return;
+    }
+
+    const cliente = await obtenerCliente(id);
+
+    res.status(200).json(cliente);
+  } catch (error) {
+    console.error("Error al obtener los datos del cliente:", error);
+    res.status(500).send("Error al obtener los datos del cliente");
+  }
+});
+
+
+
+
