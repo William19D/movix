@@ -94,7 +94,8 @@ const UserProfilePage = () => {
       color: "bg-blue-500 hover:bg-blue-600", 
       onClick: () => {
         console.log("Editar perfil"), 
-        handleNotify();
+        navigate('/change-info');
+        
       }
     },
     { 

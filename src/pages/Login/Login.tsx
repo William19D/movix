@@ -268,7 +268,7 @@ export default function LoginForm() {
             
             <button
               type="submit"
-              className="w-full bg-[#5EEB5B] hover:bg-[#3BD838] text-black p-3 rounded-lg transition-colors duration-300"
+              className="w-full bg-[#C3E956] hover:bg-[#3BD838] text-black p-3 rounded-lg transition-colors duration-300"
             >
               Iniciar sesión
             </button>
