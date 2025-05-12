@@ -11,7 +11,6 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        // Usuario autenticado
       } else {
         navigate('/login');
       }

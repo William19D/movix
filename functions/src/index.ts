@@ -13,6 +13,24 @@ export const generarCodigoSeguimeinto = (): string => {
   return `CDE-${uuid}-${tiempo}`;
 };
 
+// Función para obtener un delivery aleatorio
+const obtenerRepartidorleatorio = async () => {
+  const snapshot = await db.collection('delivery').get();
+
+  if (snapshot.empty) {
+    throw new Error('No hay repartidores disponibles');
+  }
+
+  const deliverys = snapshot.docs;
+  const indiceAleatorio = Math.floor(Math.random() * deliverys.length);
+  const repartidorSelect = deliverys[indiceAleatorio];
+
+  return {
+    id: repartidorSelect.id,
+    ...repartidorSelect.data()
+  };
+};
+
 // Función para crear un envío
 export const crearEnvio = async (
   ciudadDestino: string,
@@ -27,6 +45,8 @@ export const crearEnvio = async (
   valorDeclarado: number
 ) => {
   const codSeguimiento = generarCodigoSeguimeinto();
+  const repartidorAsignado = await obtenerRepartidorleatorio();
+
 
   const nuevoEnvio = {
     ciudadDestino,
@@ -42,6 +62,7 @@ export const crearEnvio = async (
     nombreRemitente,
     tipoEnvio,
     valorDeclarado,
+    deliveryId: repartidorAsignado.id
   };
 
   try {
@@ -57,7 +78,7 @@ export const crearEnvio = async (
 export const registrarEnvio = onRequest(async (req, res) => {
   // Manejo de preflight OPTIONS
   if (req.method === 'OPTIONS') {
-    res.set('Access-Control-Allow-Origin', '*'); // Puedes reemplazar * por tu dominio
+    res.set('Access-Control-Allow-Origin', '*');
     res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.set('Access-Control-Allow-Headers', 'Content-Type');
     res.set('Access-Control-Max-Age', '3600');
@@ -66,7 +87,7 @@ export const registrarEnvio = onRequest(async (req, res) => {
   }
 
   // CORS para solicitudes POST normales
-  res.set('Access-Control-Allow-Origin', '*'); // Puedes reemplazar * por 'http://localhost:3000', etc.
+  res.set('Access-Control-Allow-Origin', '*'); 
 
   try {
     const {
@@ -115,5 +136,186 @@ export const registrarEnvio = onRequest(async (req, res) => {
   } catch (error) {
     console.error("Error al crear envío:", error);
     res.status(500).send("Error al registrar el envío");
+  }
+});
+
+export const obtenerCliente = async (id : any) => {
+  try {
+    
+    const clientRef = db.collection('clientes').doc(id);
+    const doc = await clientRef.get();
+
+    if (!doc.exists) {
+      throw new Error('Cliente no encontrado');
+    }
+
+    return doc.data(); 
+  } catch (error) {
+    console.error('Error obteniendo los datos del cliente:', error);
+    throw error;
+  }
+};
+
+
+export const getCliente = onRequest(async (req, res) => {
+  
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Origin', '*'); 
+    res.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.set('Access-Control-Max-Age', '3600');
+    res.status(204).send('');
+    return;
+  }
+
+  // CORS para solicitudes GET normales
+  res.set('Access-Control-Allow-Origin', '*'); 
+
+  try {
+    const { id } = req.params; // obtengan el id desde los parámetros de la url
+
+    if (!id) {
+      res.status(400).send("El ID del cliente es requerido");
+      return;
+    }
+
+    const cliente = await obtenerCliente(id);
+
+    res.status(200).json(cliente);
+  } catch (error) {
+    console.error("Error al obtener los datos del cliente:", error);
+    res.status(500).send("Error al obtener los datos del cliente");
+  }
+});
+
+
+export const desactivarCuentaCliente = async (id: string) => {
+  try {
+    
+    const cliente = db.collection('clientes').doc(id);
+    
+    await cliente.update({
+      estadoCuenta: false
+    });
+
+    return { message: 'Cuenta desactivada exitosamente' };
+  } catch (error) {
+    console.error('Error desactivando la cuenta:', error);
+    throw new Error('Error al desactivar la cuenta');
+  }
+};
+
+
+export const desactivarCuenta = onRequest(async (req, res) => {
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.set('Access-Control-Max-Age', '3600');
+    res.status(204).send('');
+    return;
+  }
+
+  res.set('Access-Control-Allow-Origin', '*');
+
+  try {
+    const { idCliente } = req.params;
+
+    if (!idCliente) {
+      res.status(400).send('ID de cliente es requerido');
+      return;
+    }
+
+    const result = await desactivarCuentaCliente(idCliente);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error('Error al desactivar la cuenta:', error);
+    res.status(500).send('Error al desactivar la cuenta');
+  }
+});
+
+export const obtenerEnviosPorRepartiord = onRequest(async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.set('Access-Control-Max-Age', '3600');
+    res.status(204).send('');
+    return;
+  }
+
+  try {
+    const { idRepartidor } = req.body;
+
+    if (!idRepartidor) {
+      res.status(400).json({ error: 'Falta el ID del delivery' });
+      return;
+    }
+
+    const snapshot = await db
+      .collection('envios')
+      .where('ID', '==', idRepartidor)
+      .get();
+
+    const envios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    res.status(200).json(envios);
+  } catch (error) {
+    console.error('Error obteniendo envíos del delivery:', error);
+    res.status(500).send('Error al obtener los envíos');
+  }
+});
+
+/**
+ * Cambio de estado del envío, de Pendiente a Finalizado
+ */
+
+export const cambioEstadoEnvio = async (codigo: string, estado: string) => {
+  try {
+    const enviosRef = db.collection('envios');
+    const query = await enviosRef.where('codigoSeguimiento', '==', codigo).get();
+
+    const batch = db.batch();
+
+    query.forEach((i) => {
+      const docRef = enviosRef.doc(i.id);
+      batch.update(docRef, { estado: 'finalizado' });
+    });
+
+    await batch.commit();
+    return { mensaje: `Estado actualizado a ${estado}` };
+  } catch (error) {
+    console.log(error);
+
+    throw new Error('Error al cambiar el estado del envío');
+  }
+};
+
+export const cambioEnvio = onRequest(async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.set('Access-Control-Max-Age', '3600');
+    res.status(204).send('');
+    return;
+  }
+
+  try {
+    const { codigo, estado } = req.body;
+
+    if (!codigo || !estado) {
+      res.status(400).json({ mensaje: 'Código y estado son requeridos' });
+      return;
+    }
+
+    const resultado = await cambioEstadoEnvio(codigo, estado);
+    res.status(200).json(resultado);
+
+  } catch (error) {
+   console.error('Error al cambiar estado del envío:', error);
+    res.status(500).json({ mensaje: 'Error interno del servidor' });
   }
 });
