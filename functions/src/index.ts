@@ -13,6 +13,24 @@ export const generarCodigoSeguimeinto = (): string => {
   return `CDE-${uuid}-${tiempo}`;
 };
 
+// Función para obtener un delivery aleatorio
+const obtenerRepartidorleatorio = async () => {
+  const snapshot = await db.collection('delivery').get();
+
+  if (snapshot.empty) {
+    throw new Error('No hay repartidores disponibles');
+  }
+
+  const deliverys = snapshot.docs;
+  const indiceAleatorio = Math.floor(Math.random() * deliverys.length);
+  const repartidorSelect = deliverys[indiceAleatorio];
+
+  return {
+    id: repartidorSelect.id,
+    ...repartidorSelect.data()
+  };
+};
+
 // Función para crear un envío
 export const crearEnvio = async (
   ciudadDestino: string,
@@ -27,6 +45,8 @@ export const crearEnvio = async (
   valorDeclarado: number
 ) => {
   const codSeguimiento = generarCodigoSeguimeinto();
+  const repartidorAsignado = await obtenerRepartidorleatorio();
+
 
   const nuevoEnvio = {
     ciudadDestino,
@@ -42,6 +62,7 @@ export const crearEnvio = async (
     nombreRemitente,
     tipoEnvio,
     valorDeclarado,
+    deliveryId: repartidorAsignado.id
   };
 
   try {
@@ -57,7 +78,7 @@ export const crearEnvio = async (
 export const registrarEnvio = onRequest(async (req, res) => {
   // Manejo de preflight OPTIONS
   if (req.method === 'OPTIONS') {
-    res.set('Access-Control-Allow-Origin', '*'); // Puedes reemplazar * por tu dominio
+    res.set('Access-Control-Allow-Origin', '*');
     res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.set('Access-Control-Allow-Headers', 'Content-Type');
     res.set('Access-Control-Max-Age', '3600');
@@ -66,7 +87,7 @@ export const registrarEnvio = onRequest(async (req, res) => {
   }
 
   // CORS para solicitudes POST normales
-  res.set('Access-Control-Allow-Origin', '*'); // Puedes reemplazar * por 'http://localhost:3000', etc.
+  res.set('Access-Control-Allow-Origin', '*'); 
 
   try {
     const {
@@ -213,3 +234,6 @@ export const desactivarCuenta = onRequest(async (req, res) => {
   }
 });
 
+export const obtenerEnviosPorRepartiord = onRequest(async (req, res) => {
+  
+});
