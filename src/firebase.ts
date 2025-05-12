@@ -1,4 +1,3 @@
-// firebase.ts
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth"; // Importa getAuth
@@ -14,9 +13,11 @@ const firebaseConfig = {
     measurementId: "G-KGJ3D3225H"
 };
 
+// Inicializa Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-const auth = getAuth(app); // Usa getAuth(app)
-const db = getFirestore(app); // Usa getFirestore(app)
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-export { app, analytics , auth, db};
+// Exporta db como firestore también para mantener compatibilidad con tu código existente
+export { app, analytics, auth, db, db as firestore };

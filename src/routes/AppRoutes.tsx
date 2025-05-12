@@ -19,7 +19,7 @@ import Dashboard from "../pages/User/Dashboard/Dashboard";
 import Rastrear from "../pages/Rastrear/Rastrear";
 import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
 import ResetPassword from "../pages/ForgotPassword/ResetPassword";
-
+import DriverDashboard from "../pages/Driver-dashboard/DriverDashboard";
 
 const AppContent: React.FC = () => {
   const location = useLocation();
@@ -79,6 +79,7 @@ const AppContent: React.FC = () => {
           <Route path="/rastrear" element={<Rastrear />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/driver-dashboard" element={<DriverDashboard />} />
           {/* Add more routes as needed */}
         </Routes>
       </div>
