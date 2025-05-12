@@ -267,3 +267,27 @@ export const obtenerEnviosPorRepartiord = onRequest(async (req, res) => {
   }
 });
 
+/**
+ * Cambio de estado del envío, de Pendiente a Finalizado
+ */
+
+export const cambioEstadoEnvio = async (codigo: string, estado: string) => {
+  try {
+    const enviosRef = db.collection('envios');
+    const query = await enviosRef.where('codigoSeguimiento', '==', codigo).get();
+
+    const batch = db.batch();
+
+    query.forEach((i) => {
+      const docRef = enviosRef.doc(i.id);
+      batch.update(docRef, { estado: 'finalizado' });
+    });
+
+    await batch.commit();
+    return { mensaje: `Estado actualizado a ${estado}` };
+  } catch (error) {
+    console.log(error);
+
+    throw new Error('Error al cambiar el estado del envío');
+  }
+};
