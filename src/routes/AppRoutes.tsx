@@ -18,6 +18,8 @@ import Profile from "../pages/User/Profile/Profile"
 import Dashboard from "../pages/User/Dashboard/Dashboard";
 import Rastrear from "../pages/Rastrear/Rastrear";
 import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
+import ResetPassword from "../pages/ForgotPassword/ResetPassword";
+
 
 const AppContent: React.FC = () => {
   const location = useLocation();
@@ -76,8 +78,7 @@ const AppContent: React.FC = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/rastrear" element={<Rastrear />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/rastrear" element={<Rastrear />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           {/* Add more routes as needed */}
         </Routes>
       </div>
