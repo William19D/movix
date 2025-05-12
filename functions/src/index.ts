@@ -185,3 +185,31 @@ export const desactivarCuentaCliente = async (id: string) => {
 };
 
 
+export const desactivarCuenta = onRequest(async (req, res) => {
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.set('Access-Control-Max-Age', '3600');
+    res.status(204).send('');
+    return;
+  }
+
+  res.set('Access-Control-Allow-Origin', '*');
+
+  try {
+    const { idCliente } = req.params;
+
+    if (!idCliente) {
+      res.status(400).send('ID de cliente es requerido');
+      return;
+    }
+
+    const result = await desactivarCuentaCliente(idCliente);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error('Error al desactivar la cuenta:', error);
+    res.status(500).send('Error al desactivar la cuenta');
+  }
+});
+
