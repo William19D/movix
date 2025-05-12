@@ -291,3 +291,30 @@ export const cambioEstadoEnvio = async (codigo: string, estado: string) => {
     throw new Error('Error al cambiar el estado del envío');
   }
 };
+
+export const cambioEnvio = onRequest(async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.set('Access-Control-Max-Age', '3600');
+    res.status(204).send('');
+    return;
+  }
+
+  try {
+    const { codigo, estado } = req.body;
+
+    if (!codigo || !estado) {
+      res.status(400).json({ mensaje: 'Código y estado son requeridos' });
+      return;
+    }
+
+    const resultado = await cambioEstadoEnvio(codigo, estado);
+    res.status(200).json(resultado);
+    
+  } catch (error) {
+   
+  }
+});
