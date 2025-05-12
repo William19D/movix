@@ -19,6 +19,7 @@ export default function LoginForm() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [userPhoto, setUserPhoto] = useState<string | null>(null);
+  const [userType, setUserType] = useState<'user' | 'driver'>('user');
 
   // Manejo del resultado de redirección
   useEffect(() => {
@@ -57,7 +58,13 @@ export default function LoginForm() {
       if (result.user?.photoURL) {
         setUserPhoto(result.user.photoURL);
       }
-      navigate('/User-dashboard');
+      
+      // Redirigir según el tipo de usuario seleccionado
+      if (userType === 'driver') {
+        navigate('/driver-dashboard');
+      } else {
+        navigate('/User-dashboard');
+      }
     } catch (error: any) {
       handleAuthError(error);
     } finally {
@@ -98,11 +105,11 @@ export default function LoginForm() {
   
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      if (email === 'admin@gmail.com' && password === 'aDmIN2025')
-      {
+      if (email === 'admin@gmail.com' && password === 'aDmIN2025') {
         navigate('/admin-dashboard');
-      }
-      else{
+      } else if (userType === 'driver') {
+        navigate('/driver-dashboard');
+      } else {
         navigate('/User-dashboard');
       }
     } catch (error: any) {
@@ -192,6 +199,30 @@ export default function LoginForm() {
               </button>
             </p>
           </div>
+          
+          {/* Toggle para seleccionar tipo de usuario */}
+          <div className="flex rounded-lg overflow-hidden border border-gray-300 mb-4 w-full max-w-md">
+            <button
+              onClick={() => setUserType('user')}
+              className={`flex-1 py-2 px-4 text-center transition-colors ${
+                userType === 'user'
+                  ? 'bg-[#5EEB5B] text-black'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              Cliente
+            </button>
+            <button
+              onClick={() => setUserType('driver')}
+              className={`flex-1 py-2 px-4 text-center transition-colors ${
+                userType === 'driver'
+                  ? 'bg-[#5EEB5B] text-black'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              Transportista
+            </button>
+          </div>
 
           {/* Google Sign-in Button */}
           <div className="mt-4 space-y-3 w-full max-w-md">
@@ -270,7 +301,7 @@ export default function LoginForm() {
               type="submit"
               className="w-full bg-[#5EEB5B] hover:bg-[#3BD838] text-black p-3 rounded-lg transition-colors duration-300"
             >
-              Iniciar sesión
+              {userType === 'driver' ? 'Ingresar como transportista' : 'Iniciar sesión'}
             </button>
           </form>
         </div>
