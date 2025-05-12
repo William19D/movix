@@ -313,8 +313,9 @@ export const cambioEnvio = onRequest(async (req, res) => {
 
     const resultado = await cambioEstadoEnvio(codigo, estado);
     res.status(200).json(resultado);
-    
+
   } catch (error) {
-   
+   console.error('Error al cambiar estado del envío:', error);
+    res.status(500).json({ mensaje: 'Error interno del servidor' });
   }
 });
