@@ -235,5 +235,35 @@ export const desactivarCuenta = onRequest(async (req, res) => {
 });
 
 export const obtenerEnviosPorRepartiord = onRequest(async (req, res) => {
-  
+  res.set('Access-Control-Allow-Origin', '*');
+
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.set('Access-Control-Max-Age', '3600');
+    res.status(204).send('');
+    return;
+  }
+
+  try {
+    const { idRepartidor } = req.body;
+
+    if (!idRepartidor) {
+      res.status(400).json({ error: 'Falta el ID del delivery' });
+      return;
+    }
+
+    const snapshot = await db
+      .collection('envios')
+      .where('ID', '==', idRepartidor)
+      .get();
+
+    const envios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    res.status(200).json(envios);
+  } catch (error) {
+    console.error('Error obteniendo envíos del delivery:', error);
+    res.status(500).send('Error al obtener los envíos');
+  }
 });
+
