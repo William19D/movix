@@ -22,7 +22,7 @@ const TopbarUser: React.FC = () => {
   }, [navigate]);
 
   const handleLogoClick = () => {
-    navigate('/home');
+    navigate('/User-dashboard');
   };
 
   const handleLogout = () => {

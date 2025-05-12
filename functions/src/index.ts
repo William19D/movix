@@ -207,6 +207,7 @@ export const desactivarCuentaCliente = async (id: string) => {
 
 
 export const desactivarCuenta = onRequest(async (req, res) => {
+  // Configuración CORS para preflight OPTIONS
   if (req.method === 'OPTIONS') {
     res.set('Access-Control-Allow-Origin', '*');
     res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -216,10 +217,18 @@ export const desactivarCuenta = onRequest(async (req, res) => {
     return;
   }
 
+  // Configuración CORS para la respuesta principal
   res.set('Access-Control-Allow-Origin', '*');
 
   try {
-    const { idCliente } = req.params;
+    // Verificar que sea método POST
+    if (req.method !== 'POST') {
+      res.status(405).send('Método no permitido');
+      return;
+    }
+
+    // Obtener idCliente del body (para POST)
+    const { idCliente } = req.body;
 
     if (!idCliente) {
       res.status(400).send('ID de cliente es requerido');

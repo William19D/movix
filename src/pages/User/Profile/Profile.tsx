@@ -1,62 +1,60 @@
 import { useEffect, useState } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../../../firebase'; // Asegúrate de importar tus configuraciones de Firebase
+import { auth, db, app } from '../../../firebase';
 import { useNavigate } from 'react-router-dom';
-import {Notify} from '../../../components/Notify'; 
+import { Notify } from '../../../components/Notify';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 interface UserData {
   name: string;
   email: string;
   city: string;
   department: string;
+  createdAt?: Date;
 }
 
 const UserProfilePage = () => {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [profilePhoto, setProfilePhoto] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
   const navigate = useNavigate();
-   const [showNotify, setShowNotify] = useState(false);
+  const [notifyMessage, setNotifyMessage] = useState('');
+  const [showNotify, setShowNotify] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Obtener foto de perfil de Google
-        if (user.photoURL) {
-          setProfilePhoto(user.photoURL);
-        } else {
-          setProfilePhoto('https://randomuser.me/api/portraits/women/44.jpg'); // Foto por defecto
-        }
+        setProfilePhoto(user.photoURL || 'https://randomuser.me/api/portraits/women/44.jpg');
 
-        // Obtener datos adicionales de Firestore
         try {
           const userDoc = await getDoc(doc(db, 'clientes', user.uid));
           if (userDoc.exists()) {
-            const data = userDoc.data() as UserData;
-            setUserData(
-              {
+            const data = userDoc.data();
+            setUserData({
               name: user.displayName || data.name || user.email?.split('@')[0] || 'Usuario',
               email: user.email || data.email || '',
-              city: data.city || '' ,
-              department: data.department || ''
-
-             
+              city: data.city || 'None',
+              department: data.department || 'None',
+              createdAt: data.createdAt?.toDate()
             });
           } else {
-            // Datos por defecto si no existe el documento
             setUserData({
               name: user.displayName || user.email?.split('@')[0] || 'Usuario',
               email: user.email || '',
-              city: 'None' ,
+              city: 'None',
               department: 'None'
             });
           }
         } catch (error) {
-          console.error("Error obteniendo datos de Firestore:", error);
+          console.error("Error obteniendo datos:", error);
+          setNotifyMessage("Error al cargar datos del usuario");
+          setShowNotify(true);
+        } finally {
+          setLoading(false);
         }
-        
-        setLoading(false);
       } else {
         navigate('/login');
       }
@@ -65,61 +63,88 @@ const UserProfilePage = () => {
     return () => unsubscribe();
   }, [navigate]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="spinner-border text-blue-500" role="status">
-            <span className="sr-only">Cargando...</span>
-          </div>
-          <p className="mt-3">Cargando tu perfil...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!userData) {
-    return <div>Error al cargar los datos del usuario</div>;
-  }
-  const handleNotify = () => {
-    setShowNotify(true);
-    setTimeout(() => setShowNotify(false), 1500);
+  const handleDesactivarCuenta = async () => {
+    setDeleting(true);
+    try {
+      if (!auth.currentUser) throw new Error('No autenticado');
+      
+      const functions = getFunctions(app);
+      const desactivarCuenta = httpsCallable(functions, 'desactivarCuenta');
+      
+      await desactivarCuenta({ idCliente: auth.currentUser.uid });
+      
+      setNotifyMessage('✅ Cuenta desactivada correctamente');
+      setShowNotify(true);
+      setShowDeleteModal(false); // Cerrar modal inmediatamente
+      
+      setTimeout(() => {
+        signOut(auth);
+        navigate('/login');
+      }, 2000);
+    } catch (error) {
+      console.error('Error:', error);
+      setNotifyMessage('❌ ' + (error instanceof Error ? error.message : 'Error al desactivar la cuenta'));
+      setShowNotify(true);
+    } finally {
+      setDeleting(false);
+    }
   };
 
+  const handleCloseModal = () => {
+    if (!deleting) {
+      setShowDeleteModal(false);
+    }
+  };
+
+  // Cerrar modal cuando se muestra la notificación
+  useEffect(() => {
+    if (showNotify) {
+      const timer = setTimeout(() => {
+        setShowNotify(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [showNotify]);
 
   const profileActions = [
     { 
       name: "Editar Perfil", 
       icon: "✏️", 
       color: "bg-blue-500 hover:bg-blue-600", 
-      onClick: () => {
-        console.log("Editar perfil"), 
-        navigate('/change-info');
-        
-      }
-    },
-    { 
-      name: "Cambiar Contraseña", 
-      icon: "🔒", 
-      color: "bg-purple-500 hover:bg-purple-600", 
-      onClick: () => {
-        console.log("Cambiar contraseña") 
-        handleNotify();
-      }
+      onClick: () => navigate('/change-info')
     },
     { 
       name: "Configuración", 
       icon: "⚙️", 
       color: "bg-yellow-500 hover:bg-yellow-600", 
       onClick: () => {
-        console.log("Configuración") 
-        handleNotify();
+        setNotifyMessage('⚙️ Configuración en desarrollo');
+        setShowNotify(true);
       }
     },
+    { 
+      name: "Eliminar cuenta", 
+      icon: "🗑️", 
+      color: "bg-red-500 hover:bg-red-600", 
+      onClick: () => setShowDeleteModal(true)
+    },
   ];
-  const handleRegresarClick = () => {
-    navigate(-1);
-  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-red-500">Error al cargar los datos del usuario</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-8">
@@ -133,12 +158,12 @@ const UserProfilePage = () => {
             Administra tu información personal y configuración
           </p>
         </div>
+
         {/* Contenido principal */}
         <div className="bg-white rounded-xl shadow-xl overflow-hidden">
           <div className="p-6 md:p-8 lg:p-10">
-            {/* Sección superior: Información básica */}
+            {/* Sección superior */}
             <div className="flex flex-col md:flex-row gap-8 mb-10">
-              {/* Avatar y datos personales */}
               <div className="flex-shrink-0">
                 <div className="relative">
                   <img 
@@ -152,39 +177,38 @@ const UserProfilePage = () => {
                 </div>
               </div>
 
-              {/* Datos del usuario */}
               <div className="flex-1">
                 <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-800">{userData.name}</h2>
-              
+                  <h2 className="text-2xl md:text-3xl font-bold text-gray-800">{userData.name}</h2>
                   <button
-                    className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg cursor-pointer transition-colors"
-                    onClick={handleRegresarClick}
+                    className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition-colors"
+                    onClick={() => navigate(-1)}
                   >
                     Regresar
                   </button>    
                 </div>      
+                
                 <div className="mt-4 space-y-3">
                   <div className="flex items-center">
                     <span className="text-gray-500 w-32">Email:</span>
                     <span className="font-medium">{userData.email}</span>
                   </div>
                   <div className="flex items-center">
-                    <span className="text-gray-500 w-32">Tipo de cuenta:</span>
+                    <span className="text-gray-500 w-32">Tipo:</span>
                     <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
                       Usuario
                     </span>
                   </div>
                   <div className="flex items-center">
                     <span className="text-gray-500 w-32">Miembro desde:</span>
-                    <span className="font-medium">(Data)</span>
+                    <span className="font-medium">
+                      {userData.createdAt?.toLocaleDateString() || 'No disponible'}
+                    </span>
                   </div>
-
                   <div className="flex items-center">
                     <span className="text-gray-500 w-32">Ciudad:</span>
                     <span className="font-medium">{userData.city}</span>
                   </div>
-
                   <div className="flex items-center">
                     <span className="text-gray-500 w-32">Departamento:</span>
                     <span className="font-medium">{userData.department}</span>
@@ -197,26 +221,22 @@ const UserProfilePage = () => {
             <div className="mb-10">
               <h3 className="text-xl font-semibold text-gray-800 mb-4">Tus Estadísticas</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <p className="text-blue-800 text-sm font-medium">Total Envíos</p>
-                  <p className="text-2xl font-bold text-blue-600">(data)</p>
-                </div>
-                <div className="bg-yellow-50 p-4 rounded-lg">
-                  <p className="text-yellow-800 text-sm font-medium">Pendientes</p>
-                  <p className="text-2xl font-bold text-yellow-600">(data)</p>
-                </div>
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <p className="text-green-800 text-sm font-medium">Entregados</p>
-                  <p className="text-2xl font-bold text-green-600">(data)</p>
-                </div>
-                <div className="bg-purple-50 p-4 rounded-lg">
-                  <p className="text-purple-800 text-sm font-medium">En Tránsito</p>
-                  <p className="text-2xl font-bold text-purple-600">(data)</p>
-                </div>
+                {['Total Envíos', 'Pendientes', 'Entregados', 'En Tránsito'].map((item, index) => (
+                  <div key={index} className={`bg-${[
+                    'blue', 'yellow', 'green', 'purple'
+                  ][index]}-50 p-4 rounded-lg`}>
+                    <p className={`text-${[
+                      'blue', 'yellow', 'green', 'purple'
+                    ][index]}-800 text-sm font-medium`}>{item}</p>
+                    <p className={`text-2xl font-bold text-${[
+                      'blue', 'yellow', 'green', 'purple'
+                    ][index]}-600`}>(data)</p>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* Acciones de perfil */}
+            {/* Acciones */}
             <div>
               <h3 className="text-xl font-semibold text-gray-800 mb-4">Acciones</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -224,7 +244,7 @@ const UserProfilePage = () => {
                   <button
                     key={index}
                     onClick={action.onClick}
-                    className={`${action.color} text-white w-full h-24 rounded-lg cursor-pointer transition-all duration-200 hover:opacity-90 flex items-center justify-center space-x-2`}
+                    className={`${action.color} text-white w-full h-18 rounded-lg transition-all duration-200 hover:opacity-90 flex items-center justify-center space-x-2`}
                   >
                     <span className="text-2xl">{action.icon}</span>
                     <span className="font-medium">{action.name}</span>
@@ -234,9 +254,66 @@ const UserProfilePage = () => {
             </div>
           </div>
         </div>
-        <Notify message="🚧 En desarrollo" show={showNotify} />
       </div>
-      
+
+      {/* Modal de confirmación */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity duration-300"
+            onClick={handleCloseModal}
+          />
+          
+          <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6 transform transition-all duration-300">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">Confirmar desactivación</h2>
+            <div className="flex items-start mb-6">
+              <svg className="w-6 h-6 text-red-500 mt-0.5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <p className="text-gray-600">
+                ¿Estás seguro de desactivar tu cuenta? Esta acción es reversible contactando al soporte.
+              </p>
+            </div>
+
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={handleCloseModal}
+                disabled={deleting}
+                className={`px-4 py-2 border rounded-md transition-colors ${
+                  deleting 
+                    ? 'border-gray-300 text-gray-400 cursor-not-allowed' 
+                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDesactivarCuenta}
+                disabled={deleting}
+                className={`px-4 py-2 rounded-md text-white ${
+                  deleting ? 'bg-red-400 cursor-wait' : 'bg-red-600 hover:bg-red-700'
+                } flex items-center justify-center min-w-[120px]`}
+              >
+                {deleting ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Procesando...
+                  </>
+                ) : 'Confirmar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Notificación */}
+      <Notify 
+        message={notifyMessage}
+        show={showNotify}
+      />
     </div>
   );
 };
