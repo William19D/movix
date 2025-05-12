@@ -20,6 +20,7 @@ import Rastrear from "../pages/Rastrear/Rastrear";
 import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
 import ResetPassword from "../pages/ForgotPassword/ResetPassword";
 import ChangeInfo from "../pages/User/Profile/ChangeInfo";
+import CompleteProfile from "../pages/Login/CompleteProfile";
 
 
 const AppContent: React.FC = () => {
@@ -81,6 +82,7 @@ const AppContent: React.FC = () => {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/change-info" element={<ChangeInfo />} />
+          <Route path="/complete-profile" element={<CompleteProfile />} />
           
           {/* Add more routes as needed */}
         </Routes>
