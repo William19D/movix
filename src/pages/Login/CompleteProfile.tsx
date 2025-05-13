@@ -24,8 +24,7 @@ const CompleteProfile: React.FC = () => {
 
   const [formData, setFormData] = useState({
     name: state?.user.displayName || '',
-    phone: '',
-    address: '',
+  
   });
 
   const [departments, setDepartments] = useState<Option[]>([]);
@@ -70,12 +69,11 @@ const CompleteProfile: React.FC = () => {
       await setDoc(doc(db, 'clientes', state.user.uid), {
         name: formData.name,
         email: state.user.email,
-        phone: formData.phone,
-        address: formData.address,
         department: selectedDepartment?.label || '',
         city: selectedCity?.label || '',
         createdAt: new Date(),
         authProvider: 'google',
+        estadoCuenta: true,
         photoURL: state.user.photoURL || '',
       });
 

@@ -64,7 +64,7 @@ const ChangeInfo = () => {
                 name: user.displayName || data.name || user.email?.split('@')[0] || 'Usuario',
                 email: user.email || data.email || '',
                 city: data.city || '' ,
-                department: data.department || ''
+                department: data.department || '',
   
                
               });
