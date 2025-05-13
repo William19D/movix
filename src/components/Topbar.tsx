@@ -119,6 +119,8 @@ const Topbar: React.FC = () => {
           <button
             className="text-black text-[1.8vh] lg:text-[2vh] hover:underline"
             onClick={handleRegisterClick}
+            style={{ cursor: 'pointer' }}
+            
           >
             Registrarse
           </button>

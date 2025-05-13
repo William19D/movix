@@ -205,8 +205,8 @@ export const desactivarCuentaCliente = async (id: string) => {
   }
 };
 
-
 export const desactivarCuenta = onRequest(async (req, res) => {
+  // Configuración CORS
   if (req.method === 'OPTIONS') {
     res.set('Access-Control-Allow-Origin', '*');
     res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -219,18 +219,72 @@ export const desactivarCuenta = onRequest(async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
 
   try {
-    const { idCliente } = req.params;
-
-    if (!idCliente) {
-      res.status(400).send('ID de cliente es requerido');
+    if (req.method !== 'POST') {
+      res.status(405).json({ success: false, message: 'Método no permitido' });
       return;
     }
 
-    const result = await desactivarCuentaCliente(idCliente);
-    res.status(200).json(result);
-  } catch (error) {
+    // Corregido: idCliente -> idCliente
+    const { idCliente } = req.body;
+
+    if (!idCliente) {
+      res.status(400).json({ success: false, message: 'ID de cliente es requerido' });
+      return;
+    }
+
+    // 1. Desactivar en Firestore
+    const clienteRef = db.collection('clientes').doc(idCliente);
+    await clienteRef.update({
+      estadoCuenta: false,
+      fechaDesactivacion: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    // 2. Desactivar en Authentication
+    try {
+      await admin.auth().updateUser(idCliente, {
+        disabled: true
+      });
+    } catch (authError: any) { // Tipado explícito del error
+      // Solo ignoramos si el usuario no existe en Auth
+      if (authError.code !== 'auth/user-not-found') {
+        throw authError;
+      }
+      // Podemos registrar que no existía en Auth si es necesario
+      console.log(`Usuario ${idCliente} no encontrado en Auth, solo desactivado en Firestore`);
+    }
+
+    res.status(200).json({ 
+      success: true,
+      message: 'Cuenta desactivada exitosamente'
+    });
+
+  } catch (error: any) { // Tipado explícito del error
     console.error('Error al desactivar la cuenta:', error);
-    res.status(500).send('Error al desactivar la cuenta');
+    
+    // Mapeo de errores comunes
+    let statusCode = 500;
+    let errorMessage = 'Error al desactivar la cuenta';
+    
+    if (error.code === 'auth/insufficient-permission') {
+      statusCode = 403;
+      errorMessage = 'No tienes permisos para realizar esta acción';
+    } else if (error.code === 'not-found') {
+      statusCode = 404;
+      errorMessage = 'Cliente no encontrado';
+    } else if (error.code === 'permission-denied') {
+      statusCode = 403;
+      errorMessage = 'Permisos insuficientes en Firestore';
+    }
+
+    res.status(statusCode).json({
+      success: false,
+      message: errorMessage,
+      // Solo muestra detalles del error en desarrollo
+      ...(process.env.NODE_ENV === 'development' && { 
+        error: error.message,
+        code: error.code 
+      })
+    });
   }
 });
 

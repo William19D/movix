@@ -46,24 +46,51 @@ export default function LoginForm() {
     return () => unsubscribe();
   }, []);
 
+
+
+
+
   // Autenticación con Google
   const signInWithGoogle = async () => {
     try {
       setGoogleLoading(true);
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
-      
       const result = await signInWithPopup(auth, provider);
-      if (result.user?.photoURL) {
-        setUserPhoto(result.user.photoURL);
+  
+      const creationTime = result.user.metadata?.creationTime;
+      const lastSignInTime = result.user.metadata?.lastSignInTime;
+      
+      const isNewUser =
+        creationTime &&
+        lastSignInTime &&
+        new Date(creationTime).getTime() === new Date(lastSignInTime).getTime();
+      
+  
+      if (isNewUser) {
+        navigate('/complete-profile', {
+          state: {
+            user: {
+              uid: result.user.uid,
+              email: result.user.email,
+              displayName: result.user.displayName,
+              photoURL: result.user.photoURL,
+            },
+          },
+        });
+      } else {
+        if (result.user?.photoURL) {
+          setUserPhoto(result.user.photoURL);
+        }
+        navigate('/User-dashboard');
       }
-      navigate('/User-dashboard');
     } catch (error: any) {
       handleAuthError(error);
     } finally {
       setGoogleLoading(false);
     }
   };
+  
 
   // Función para manejar errores
   const handleAuthError = (error: any) => {
@@ -268,7 +295,7 @@ export default function LoginForm() {
             
             <button
               type="submit"
-              className="w-full bg-[#5EEB5B] hover:bg-[#3BD838] text-black p-3 rounded-lg transition-colors duration-300"
+              className="w-full bg-[#C3E956] hover:bg-[#3BD838] text-black p-3 rounded-lg transition-colors duration-300"
             >
               Iniciar sesión
             </button>

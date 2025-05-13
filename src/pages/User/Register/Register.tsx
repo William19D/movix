@@ -120,6 +120,9 @@ const Register: React.FC = () => {
                     email: email, // Usamos la variable email del estado
                     department: selectedDepartment?.label || '',
                     city: selectedCity?.label || '',
+                    estadoCuenta: true,
+                    createdAt: new Date(),
+
                 });
                 console.log('Usuario registrado con éxito');
                 cleanUpForm();

@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth"; // Importa getAuth
 import { getFirestore } from "firebase/firestore"; // Importa getFirestore
+import { getFunctions } from 'firebase/functions';
 
 const firebaseConfig = {
     apiKey: "AIzaSyAjiuV5YgJmAxxkRZRV5VxUv_AKCQzXOS4",
@@ -18,5 +19,6 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth(app); // Usa getAuth(app)
 const db = getFirestore(app); // Usa getFirestore(app)
+const functions = getFunctions(app);
 
-export { app, analytics , auth, db};
+export { app, analytics , auth, db, functions};
